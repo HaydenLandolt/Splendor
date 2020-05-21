@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Noble
+comment1.params=vp\ path\ diamond\ sapphire\ emerald\ ruby\ onyx
+comment1.target=Noble(int,\ java.lang.String,\ int,\ int,\ int,\ int,\ int)
+comment1.text=\r\n\ \ Constructor\ for\ a\ noble.\r\n\ \ \r\n\ \ @param\ vp\ -\ victory\ points\ awarded\ by\ the\ noble\r\n\ \ @param\ path\ -\ the\ path\ to\ the\ visual\ resource\ for\ the\ noble\r\n\ \ @param\ diamond\ -\ the\ diamond\ cost\ of\ the\ noble\r\n\ \ @param\ sapphire\ -\ the\ sapphire\ cost\ of\ the\ noble\r\n\ \ @param\ emerald\ -\ the\ emerald\ cost\ of\ the\ noble\r\n\ \ @param\ ruby\ -\ the\ ruby\ cost\ of\ the\ noble\r\n\ \ @param\ onyx\ -\ the\ onyx\ cost\ of\ the\ noble\ \r\n
+numComments=2

@@ -1,0 +1,10 @@
+3	Henry.png	0	0	0	4	4
+3	OtherLady.png	3	3	0	0	3
+3	Ferdinand.png	0	0	3	3	3
+3	Isabella.png	4	0	0	0	4
+3	Catherine.png	0	3	3	3	0
+3	Machiavelli.png	4	4	0	0	0
+3	Suleiman.png	0	4	4	0	0
+3	Elizabeth.png	0	0	4	4	0
+3	Frederick.png	3	0	0	3	3
+3	RandomLady.png	3	3	3	0	0

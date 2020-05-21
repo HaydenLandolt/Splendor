@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=GemModels
+comment1.params=gem
+comment1.target=javafx.scene.Group\ getGem(GemType)
+comment1.text=\r\n\ \ Returns\ the\ model\ for\ a\ gem.\r\n\ \ \r\n\ \ @param\ gemType\ -\ the\ type\ of\ gem\ to\ retrieve\ a\ model\ for\r\n\ \ @return\ the\ model\ for\ the\ desired\ gem\r\n
+numComments=2

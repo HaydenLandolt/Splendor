@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=DeckGenerator
+comment1.params=
+comment1.target=java.util.Stack\ generateLevel1Deck()
+comment1.text=\r\n\ \ Creates\ a\ shuffled\ deck\ of\ cards\ and\ returns\ it\ as\ a\ Stack.\r\n\ \ \r\n\ \ @return\ the\ deck\r\n
+comment2.params=
+comment2.target=java.util.Stack\ generateLevel2Deck()
+comment2.text=\r\n\ \ Creates\ a\ shuffled\ deck\ of\ cards\ and\ returns\ it\ as\ a\ Stack.\r\n\ \ \r\n\ \ @return\ the\ deck\r\n
+comment3.params=
+comment3.target=java.util.Stack\ generateLevel3Deck()
+comment3.text=\r\n\ \ Creates\ a\ shuffled\ deck\ of\ cards\ and\ returns\ it\ as\ a\ Stack.\r\n\ \ \r\n\ \ @return\ the\ deck\r\n
+comment4.params=
+comment4.target=java.util.Stack\ generateNoblesDeck()
+comment4.text=\r\n\ \ Creates\ a\ shuffled\ deck\ of\ nobles\ and\ returns\ it\ as\ a\ Stack.\r\n\ \ \r\n\ \ @return\ the\ deck\ of\ nobles\r\n
+comment5.params=file
+comment5.target=void\ shuffle(java.io.File)
+comment5.text=\r\n\ \ Shuffles\ the\ entries\ in\ a\ given\ file\ and\ prints\ it\ to\ a\ new\ file\r\n\ \ to\ be\ used\ by\ the\ deck\ generating\ methods.\r\n\ \ \r\n\ \ @param\ file\ -\ the\ file\ to\ be\ shuffled\r\n
+comment6.params=arrayList\ name
+comment6.target=void\ printShuffledDeck(java.util.ArrayList,\ java.lang.String)
+comment6.text=\r\n\ Prints\ the\ shuffled\ list\ and\ appends\ "_Shuffled"\ to\ the\ file\ name.\r\n\ \r\n\ @param\ arrayList\ -\ the\ list\ of\ entries\ to\ be\ shuffled\r\n\ @param\ name\ -\ the\ name\ of\ the\ database\ less\ the\ ".txt"\ extension\r\n
+numComments=7

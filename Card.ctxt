@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=Card
+comment1.params=vp\ gem\ diamond\ sapphire\ emerald\ ruby\ onyx
+comment1.target=Card(int,\ GemType,\ int,\ int,\ int,\ int,\ int)
+comment1.text=\r\n\ \ Constructor\ for\ a\ market\ card.\r\n\ \ \r\n\ \ @param\ vp\ -\ victory\ points\ awarded\ by\ the\ card\r\n\ \ @param\ gem\ -\ the\ type\ of\ gem\ the\ card\ awards\ a\ bonus\ for\r\n\ \ @param\ diamond\ -\ the\ diamond\ cost\ of\ the\ card\r\n\ \ @param\ sapphire\ -\ the\ sapphire\ cost\ of\ the\ card\r\n\ \ @param\ emerald\ -\ the\ emerald\ cost\ of\ the\ card\r\n\ \ @param\ ruby\ -\ the\ ruby\ cost\ of\ the\ card\r\n\ \ @param\ onyx\ -\ the\ onyx\ cost\ of\ the\ card\ \r\n
+comment2.params=
+comment2.target=GemType\ getGemType()
+comment2.text=\r\n\ Getter\ for\ the\ gem\ bonus\ awarded\ by\ the\ card.\r\n\ \r\n\ @return\ the\ gem\ bonus\ awarded\ by\ the\ card\r\n
+numComments=3

@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=MarketObject
+comment1.params=vp\ diamond\ sapphire\ emerald\ ruby\ onyx
+comment1.target=MarketObject(int,\ int,\ int,\ int,\ int,\ int)
+comment1.text=\r\n\ \ Constructor\ for\ the\ MarketObject\ class.\r\n\ \ \r\n\ \ @param\ vp\ -\ victory\ points\ awarded\ by\ the\ object\r\n\ \ @param\ diamond\ -\ the\ diamond\ cost\ of\ the\ object\r\n\ \ @param\ sapphire\ -\ the\ sapphire\ cost\ of\ the\ object\r\n\ \ @param\ emerald\ -\ the\ emerald\ cost\ of\ the\ object\r\n\ \ @param\ ruby\ -\ the\ ruby\ cost\ of\ the\ object\r\n\ \ @param\ onyx\ -\ the\ onyx\ cost\ of\ the\ object\r\n
+comment2.params=
+comment2.target=javafx.scene.Group\ getVisuals()
+comment2.text=\r\n\ Getter\ for\ the\ visuals\ of\ the\ object.\r\n\ \r\n\ @return\ the\ visuals\ for\ the\ object.\r\n
+comment3.params=
+comment3.target=int\ getVictoryPoints()
+comment3.text=\r\n\ \ Getter\ for\ the\ vicroty\ points\ awarded\ by\ the\ object.\r\n\ \ \r\n\ \ @return\ the\ victory\ points\ awarded\ by\ the\ object\r\n
+comment4.params=
+comment4.target=int\ getDiamondCost()
+comment4.text=\r\n\ Getter\ for\ the\ diamond\ cost\ of\ the\ object.\r\n\ \r\n\ @return\ the\ diamond\ cost\ of\ the\ object.\r\n
+comment5.params=
+comment5.target=int\ getSapphireCost()
+comment5.text=\r\n\ Getter\ for\ the\ sapphire\ cost\ of\ the\ object.\r\n\ \r\n\ @return\ the\ sapphire\ cost\ of\ the\ object.\r\n
+comment6.params=
+comment6.target=int\ getEmeraldCost()
+comment6.text=\r\n\ Getter\ for\ the\ emerald\ cost\ of\ the\ object.\r\n\ \r\n\ @return\ the\ emerald\ cost\ of\ the\ object.\r\n
+comment7.params=
+comment7.target=int\ getRubyCost()
+comment7.text=\r\n\ Getter\ for\ the\ ruby\ cost\ of\ the\ object.\r\n\ \r\n\ @return\ the\ ruby\ cost\ of\ the\ object.\r\n
+comment8.params=
+comment8.target=int\ getOnyxCost()
+comment8.text=\r\n\ Getter\ for\ the\ onyx\ cost\ of\ the\ object.\r\n\ \r\n\ @return\ the\ onyx\ cost\ of\ the\ object.\r\n
+numComments=9
