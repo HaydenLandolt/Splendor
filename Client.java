@@ -3,7 +3,7 @@ import java.net.*;
 public class Client
 {
     public static void main(String[] args){
-        String host = "192.168.0.16";
+        String host = "192.168.0.13";
         int port = 9999;
        
         /*
