@@ -101,6 +101,10 @@ public class Main extends Application
     HBox level2Available;
     HBox level3Available;
     
+    static GemType gem1Type;
+    static GemType gem2Type;
+    static GemType gem3Type;
+    
     static Group player1Group;
     static Group player2Group;
     static Group player3Group;
@@ -366,6 +370,7 @@ public class Main extends Application
         level1DeckBack = new ImageView("./Resources/CardBack_1.png");
         level1DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(gem1Type == null){ //ensures play has not started selecting gems
                     int success = players[activePlayer].addCardToHand(level1Deck.peek());
                     if (success == 1){
                         level1Deck.pop();
@@ -392,10 +397,12 @@ public class Main extends Application
                         System.out.println("Hand is full");
                     }
                 }
+            }
             });
         level2DeckBack = new ImageView("./Resources/CardBack_2.png");
         level2DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(gem1Type == null){ //ensures play has not started selecting gems
                     int success = players[activePlayer].addCardToHand(level2Deck.peek());
                     if (success == 1){
                         level2Deck.pop();
@@ -422,10 +429,12 @@ public class Main extends Application
                         System.out.println("Hand is full");
                     }
                 }
+                }
             });
         level3DeckBack = new ImageView("./Resources/CardBack_3.png");
         level3DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(gem1Type == null){ //ensures play has not started selecting gems
                     int success = players[activePlayer].addCardToHand(level3Deck.peek());
                     if (success == 1){
                         level3Deck.pop();
@@ -452,6 +461,7 @@ public class Main extends Application
                         System.out.println("Hand is full");
                     }
                 }
+            }
             });
 
         VBox marketDecks = new VBox(level1DeckBack, level2DeckBack, level3DeckBack);
@@ -465,6 +475,11 @@ public class Main extends Application
         //sets up the main scene.
         mainScene = new Scene(root, 1200, 650);
         mainScene.setFill(Color.GREEN);
+        
+        //Online Setup scene setup
+        Group onlineRoot = new Group();
+        Scene onlineSetup = new Scene(onlineRoot, 1200, 650);
+        onlineSetup.setFill(Color.GREEN);
         
         //PLAYER SELECTION SETUP
         Group playerSelectionRoot = new Group();
@@ -516,7 +531,7 @@ public class Main extends Application
         multiplayerOnline.setTextAlignment(TextAlignment.CENTER);
         multiplayerOnline.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
-                    System.out.println("Coming Soon");
+                   stage.setScene(onlineSetup);
                 }
             }); 
         
@@ -567,6 +582,85 @@ public class Main extends Application
         Group mainMenuRoot = new Group(mainLogo, mainMenuOptions, mainMacroButtons);
         mainMenu = new Scene(mainMenuRoot, 1200, 650);
         mainMenu.setFill(Color.GREEN);
+        
+        //MULTIPLAYER ONLINE
+        ImageView onlineScreenLogo = new ImageView("./Resources/logo-Splendor.png");
+        onlineScreenLogo.setScaleX(0.5);
+        onlineScreenLogo.setScaleY(0.5);
+        onlineScreenLogo.setTranslateX(-550);
+        onlineScreenLogo.setTranslateY(-250);
+        
+        Button joinGame = new Button();
+        joinGame.setFocusTraversable(false);
+        joinGame.setText("Join Game");
+        joinGame.setScaleX(1.05);
+        joinGame.setScaleY(1.25);
+        joinGame.setTranslateX(6);
+        joinGame.setFont(Font.font("Verdana", 20));
+        joinGame.setTextAlignment(TextAlignment.CENTER);
+        joinGame.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    
+                }
+            }); 
+        
+        Button hostGame = new Button();
+        hostGame.setFocusTraversable(false);
+        hostGame.setText("Multiplayer (Online)");
+        hostGame.setScaleY(1.25);
+        hostGame.setFont(Font.font("Verdana", 20));
+        hostGame.setTextAlignment(TextAlignment.CENTER);
+        hostGame.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    
+                }
+            }); 
+        
+        VBox onlineOptions = new VBox(joinGame, hostGame);
+        onlineOptions.setSpacing(40);
+        onlineOptions.setTranslateX(500);
+        onlineOptions.setTranslateY(350);
+        
+        //control buttons
+        Button onlineHelp = new Button("HELP");
+        onlineHelp.setTextAlignment(TextAlignment.CENTER);
+        onlineHelp.setFocusTraversable(false);
+        onlineHelp.setScaleX(2.5);
+        onlineHelp.setScaleY(1.75);
+        onlineHelp.setTranslateX(25);
+        onlineHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event) {
+                    //Opens the instruction manual pdf through your Desktop's
+                    //default program for opening a pdf
+                           if (Desktop.isDesktopSupported()) {
+                    try {
+                    Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
+                    } catch (Exception e) {
+                    e.printStackTrace();
+                    }
+                    }
+
+                }
+            }); 
+            
+        Button onlineBack = new Button("BACK");
+        onlineBack.setTextAlignment(TextAlignment.CENTER);
+        onlineBack.setFocusTraversable(false);
+        onlineBack.setScaleX(2.35);
+        onlineBack.setScaleY(1.75);
+        onlineBack.setTranslateX(24);
+        onlineBack.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    stage.setScene(mainMenu);
+                }
+            }); 
+
+        VBox onlineMacroButtons = new VBox(onlineHelp, onlineBack);
+        onlineMacroButtons.setSpacing(22);
+        onlineMacroButtons.setTranslateX(13);
+        onlineMacroButtons.setTranslateY(565);
+        
+        onlineRoot.getChildren().addAll(onlineScreenLogo, onlineOptions, onlineMacroButtons);
         
         //WINNER SCREEN
         ImageView winnerScreenLogo = new ImageView("./Resources/logo-Splendor.png");
@@ -888,6 +982,7 @@ public class Main extends Application
     private void addMarketCardFunction(HBox marketDisplay, int index, Card card, Group cardVisuals, Stack<Card> deck, Card[] marketView){
          cardVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent event){
+                        if(gem1Type == null){ //ensures play has not started selecting gems
                         if(event.getButton() == MouseButton.PRIMARY){
                             int success = purchaseCard(card);
                             if (success == 1){ // if the card can be purchased
@@ -977,6 +1072,7 @@ public class Main extends Application
                             }
                         }
                     }
+                }
                 });
 
     }
@@ -1146,6 +1242,7 @@ public class Main extends Application
     public static void addCardInHandFunction(Group cardVisuals, Card card, HBox cardsInHand, int index){
         cardVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent event){
+                        if(gem1Type == null){ //ensures play has not started selecting gems
                         int success = purchaseCard(card);
                             if (success == 1){  //if the card can be purchased                       
                                 cardsInHand.getChildren().get(index).setVisible(false); //remove the card visuals from the hand
@@ -1159,6 +1256,7 @@ public class Main extends Application
                                 System.out.println("Not enough gems");
                             }
                         }
+                    }
     });
 }
 
@@ -1237,9 +1335,81 @@ public class Main extends Application
      * Adds a gem to the player and removes it from the market
      * 
      * @param gem - the type of gem being taken
-     * @return 0 if taking the gem is unsuccessful, 1 if taking the gem would not end the turn, and 2 if it would
+     * @return 0 if taking the gem is unsuccessful, 1 if taking the gem does not end the turn, and 2 if it does
      */
     private int takeGem(GemType gem){
+        if(players[activePlayer].getTotalGems() == 10) //checks to see if a player's inventory is full
+        return 0;
+        
+        //checks how many different types of gems are available
+        int difGemTypesAvailable = 0;
+        if (marketDiamond > 0)
+        difGemTypesAvailable++;
+        if (marketSapphire > 0)
+        difGemTypesAvailable++;
+        if (marketEmerald > 0)
+        difGemTypesAvailable++;
+        if (marketRuby > 0)
+        difGemTypesAvailable++;
+        if (marketOnyx > 0)
+        difGemTypesAvailable++;
+        
+        
+        if(gem1Type == null) //first gem is always allowed
+        gem1Type = gem;
+        else if(gem2Type == null){
+            if(gem == gem1Type && gem1Type != null){ //if the player is trying to take two gems of the same type
+                //make sure there were initially 4 gems of that type in the market
+                switch(gem){
+                 case DIAMOND:
+                 if(marketDiamond < 3){
+                     return 0;
+                    }
+                    else
+                    gem2Type = gem;
+                 break;
+                 case SAPPHIRE:
+                 if(marketSapphire < 3){
+                     return 0;
+                    }
+                    else
+                    gem2Type = gem;
+                 break;
+                 case EMERALD:
+                 if(marketEmerald < 3){
+                     return 0;
+                    }
+                    else
+                    gem2Type = gem;
+                 break;
+                 case RUBY:
+                 if(marketRuby < 3){
+                     return 0;
+                    }
+                    else
+                    gem2Type = gem;
+                 break;
+                 case ONYX:
+                 if(marketOnyx < 3){
+                     return 0;
+                    }
+                    else
+                    gem2Type = gem;
+                 break;
+                }
+            }
+            else
+            gem2Type = gem;
+        }
+        else{
+            if (gem1Type == gem || gem2Type == gem){ //makes sure the player isn't trying to double up on a type of gem
+             return 0;   
+            }
+            else{
+             gem3Type = gem;   
+            }
+        }
+        
         switch(gem){
          case DIAMOND:
          marketDiamond--;
@@ -1260,12 +1430,55 @@ public class Main extends Application
          marketGold--;
          break;
         }
-        players[activePlayer].addGem(gem);
+        players[activePlayer].addGem(gem);        
         
-        if(players[activePlayer].getTotalGems() == 10)
+        /*these statements check the various conditions the market could be in and ends the turn accordingly
+        *the turn will end if:
+        * A player has two gems and there are only two types of gems available in the market
+        * A player has one gem and there is only one type of gem available in the market
+        * There are no gems left in the market
+        * The first two gems taken were of the same type
+        * The player's inventory becomes full
+        * Or the player takes a 3rd gem
+        **/
+        if(gem2Type != null && difGemTypesAvailable == 2){
+            gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
         return 2;
+        }
+        else if(gem1Type != null && difGemTypesAvailable == 1){
+            gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
+        return 2;
+        }
+        else if(marketDiamond + marketSapphire + marketEmerald + marketRuby + marketOnyx == 0){
+            gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
+        return 2;
+        }
+       else if(gem1Type == gem2Type){
+            gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
+        return 2;
+        }
+       else if(players[activePlayer].getTotalGems() == 10){
+            gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
+        return 2;
+    }
+    else if(gem3Type != null){
+        gem1Type = null;
+            gem2Type = null;
+            gem3Type = null;
+        return 2;
+    }
         else
-        return 0;
+        return 1; // success, and you can pick more gems
     }
     
     /**
@@ -1309,6 +1522,8 @@ public class Main extends Application
     private void newGame(String player1Name, String player2Name, String player3Name, String player4Name) throws IOException{
         players = new Player[numberOfPlayers];
         activePlayer = 0;
+        
+        loadingWarning.setText(""); //resets the loading text
         
         //places the appropriate number of gems in the market
         if(numberOfPlayers == 4){
@@ -1433,6 +1648,7 @@ public class Main extends Application
             Group nobleVisuals = noble.getVisuals();
             nobleVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent event){
+                        if(gem1Type == null){ //ensures play has not started selecting gems
                         int success = purchaseNoble(noble);
                         if (success == 1){//if the noble can be purchased
                             availableNobles.getChildren().get(index).setVisible(false); //set the noble to be invisible
@@ -1444,6 +1660,7 @@ public class Main extends Application
                             System.out.println("Not enough gems");
                         }
                     }
+                }
                 });
             noblesMarket[i] = noble;
             availableNobles.getChildren().add(nobleVisuals);
