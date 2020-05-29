@@ -73,7 +73,7 @@ public class DeckGenerator
             Card card = new Card(input.nextInt(), GemType.valueOf(input.next()), input.nextInt(), input.nextInt(), input.nextInt(), input.nextInt(), input.nextInt());
             deck.push(card);
         }
-         
+        
         input.close();
         return deck;
     }

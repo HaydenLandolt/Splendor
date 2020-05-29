@@ -1,4 +1,3 @@
-
 import com.interactivemesh.jfx.importer.ImportException;
 
 import java.awt.Desktop;
@@ -8,6 +7,8 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Stack;
+
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 
@@ -393,8 +394,8 @@ public class Main extends Application
                         nextTurn();
                     }
                     else {
-                        //show some warning... (not the following)
-                        System.out.println("Hand is full");
+                        instructions.setText("\n\n   Your hand is full");
+                        optionText.setText("");
                     }
                 }
             }
@@ -425,8 +426,8 @@ public class Main extends Application
                         nextTurn();
                     }
                     else {
-                        //show some warning... (not the following)
-                        System.out.println("Hand is full");
+                        instructions.setText("\n\n   Your hand is full");
+                        optionText.setText("");
                     }
                 }
                 }
@@ -457,8 +458,8 @@ public class Main extends Application
                         nextTurn();
                     }
                     else {
-                        //show some warning... (not the following)
-                        System.out.println("Hand is full");
+                        instructions.setText("\n\n   Your hand is full");
+                        optionText.setText("");
                     }
                 }
             }
@@ -1022,7 +1023,8 @@ public class Main extends Application
                             }
                             else {
                                 //show some warning... (not the following)
-                                System.out.println("Not enough gems");
+                                instructions.setText("\n\n   Not enough gems");
+                            optionText.setText("");
                             }
                         }
                         else{
@@ -1068,7 +1070,8 @@ public class Main extends Application
                             }
                             else {
                                 //show some warning... (not the following)
-                                System.out.println("Hand is full");
+                                instructions.setText("\n\n   Your hand is full");
+                            optionText.setText("");
                             }
                         }
                     }
@@ -1253,7 +1256,8 @@ public class Main extends Application
                             }
                             else {
                                 //show some warning... (not the following)
-                                System.out.println("Not enough gems");
+                                instructions.setText("\n\n   Not enough gems");
+                            optionText.setText("");
                             }
                         }
                     }
@@ -1280,12 +1284,7 @@ public class Main extends Application
      
      //updates the text in the tooltip display
      turnMarker.setText(players[activePlayer].getName()  + "'s");
-     instructions.setText("Choose from one of\n the following actions:");
-     optionText.setText("1. Take 3 gems of\n different types\n\n" +
-                                   "2. Take 2 gems of the\n same type\n" +
-                                   " (Must be 4 tokens of\n that type)\n\n" +
-                                   "3. Reserve a card and\n take a Gold\n\n" +
-                                   "4. Purchase a card");
+     resetInstructions();
     }
     
     /**
@@ -1431,6 +1430,19 @@ public class Main extends Application
          break;
         }
         players[activePlayer].addGem(gem);        
+        
+        if (gem2Type != null && gem2Type != gem1Type){
+         instructions.setText("\n    Select one more \nunique gem");
+         optionText.setText("");
+        }
+        else if(gem1Type != null && difGemTypesAvailable == 2){
+            instructions.setText("\n    Select one more \nunique gem");
+         optionText.setText("");
+        }
+        else if(gem1Type != null){
+         instructions.setText("\n  Select two more \nunique gems \n\n or \n\n Select another gem \nof the same type");
+         optionText.setText("");
+        }
         
         /*these statements check the various conditions the market could be in and ends the turn accordingly
         *the turn will end if:
@@ -1656,8 +1668,8 @@ public class Main extends Application
                             nextTurn();
                         }
                         else {
-                            //show some warning... (not the following)
-                            System.out.println("Not enough gems");
+                            instructions.setText("\n\n Not enough bonuses");
+                            optionText.setText("");
                         }
                     }
                 }
@@ -1764,5 +1776,14 @@ public class Main extends Application
         Scene enterNamesScene = new Scene(enterNamesRoot, 1200, 650);
         enterNamesScene.setFill(Color.GREEN);
         mainStage.setScene(enterNamesScene);
+    }
+    
+    private static void resetInstructions(){
+     instructions.setText("Choose from one of\n the following actions:");
+     optionText.setText("1. Take 3 gems of\n different types\n\n" +
+                                   "2. Take 2 gems of the\n same type\n" +
+                                   " (Must be 4 tokens of\n that type)\n\n" +
+                                   "3. Reserve a card and\n take a Gold\n\n" +
+                                   "4. Purchase a card");
     }
 }
