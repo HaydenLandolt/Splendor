@@ -27,11 +27,14 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Player
 {
     int id;
     String name;
+    boolean isAI;
+    int aiProtocolID;
     int victoryPoints = 0;
     int diamond = 0;
     int sapphire = 0;
@@ -39,11 +42,11 @@ public class Player
     int ruby = 0;
     int onyx = 0; 
     int gold = 0;
-    int diamondCards = 0;
-    int sapphireCards = 0;
-    int emeraldCards = 0;
-    int rubyCards = 0;
-    int onyxCards = 0;
+    int diamondCards = 4;
+    int sapphireCards = 4;
+    int emeraldCards = 4;
+    int rubyCards = 4;
+    int onyxCards = 4;
     Card[] hand = new Card[3];
     boolean hasNoble = false;
     
@@ -55,6 +58,8 @@ public class Player
     
     ArrayList<GemType> gemsForMarket = new ArrayList<GemType>();
     
+    Random random = new Random();
+    
     GemModels gemModels = new GemModels();
     
     Rectangle border;
@@ -65,10 +70,14 @@ public class Player
      * @param id - the player's id, also serves as the player's index within the main class
      * @param name - player name.
      */
-    public Player(int id, String name){
+    public Player(int id, String name, boolean isAI){
         this.id = id;
         this.name = name;
+        this.isAI = isAI;
         
+        if(isAI) //assigns an AI player a "personality"
+           aiProtocolID = random.nextInt(3) + 1;
+        System.out.println(aiProtocolID);
         /*
          * There are several if statements to see if id < 2.
          * This is to see whether or not the player is the 3rd
@@ -476,10 +485,13 @@ public class Player
        
         /**
          * Sets the colour of the player's border to yellow to indicate
-         * they are the active player.
+         * they are the active player. The method will also trigger the
+         * AI turn in a single player game.
          */
         public void setActivePlayer(){
             border.setFill(Color.YELLOW);
+            if(isAI)
+            Main.doAITurn(aiProtocolID);
         }
         
         /**

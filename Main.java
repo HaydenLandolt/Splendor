@@ -48,6 +48,8 @@ import javafx.stage.Stage;
 public class Main extends Application
 {
     DeckGenerator deckGenerator = new DeckGenerator();
+    
+    boolean isSinglePlayer = false;
 
     static int numberOfPlayers;
     static int activePlayer;
@@ -97,6 +99,8 @@ public class Main extends Application
     Card[] level1Market;
     Card[] level2Market;
     Card[] level3Market;
+    
+    static VBox availableNobles;
     
     HBox level1Available;
     HBox level2Available;
@@ -505,7 +509,8 @@ public class Main extends Application
         singlePlayer.setTextAlignment(TextAlignment.CENTER);
         singlePlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
-                    System.out.println("Coming Soon");
+                    isSinglePlayer = true;
+                    stage.setScene(playerSelection);
                 }
             }); 
 
@@ -524,22 +529,10 @@ public class Main extends Application
                 }
             }); 
         
-        Button multiplayerOnline = new Button();
-        multiplayerOnline.setFocusTraversable(false);
-        multiplayerOnline.setText("Multiplayer (Online)");
-        multiplayerOnline.setScaleY(1.25);
-        multiplayerOnline.setFont(Font.font("Verdana", 20));
-        multiplayerOnline.setTextAlignment(TextAlignment.CENTER);
-        multiplayerOnline.setOnMouseClicked( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event){
-                   stage.setScene(onlineSetup);
-                }
-            }); 
-        
-        VBox mainMenuOptions = new VBox(singlePlayer, multiplayerLocal, multiplayerOnline);
+        VBox mainMenuOptions = new VBox(singlePlayer, multiplayerLocal);
         mainMenuOptions.setSpacing(40);
         mainMenuOptions.setTranslateX(500);
-        mainMenuOptions.setTranslateY(350);
+        mainMenuOptions.setTranslateY(400);
         
         //control buttons
         Button mainMenuHelp = new Button("HELP");
@@ -582,86 +575,7 @@ public class Main extends Application
         
         Group mainMenuRoot = new Group(mainLogo, mainMenuOptions, mainMacroButtons);
         mainMenu = new Scene(mainMenuRoot, 1200, 650);
-        mainMenu.setFill(Color.GREEN);
-        
-        //MULTIPLAYER ONLINE
-        ImageView onlineScreenLogo = new ImageView("./Resources/logo-Splendor.png");
-        onlineScreenLogo.setScaleX(0.5);
-        onlineScreenLogo.setScaleY(0.5);
-        onlineScreenLogo.setTranslateX(-550);
-        onlineScreenLogo.setTranslateY(-250);
-        
-        Button joinGame = new Button();
-        joinGame.setFocusTraversable(false);
-        joinGame.setText("Join Game");
-        joinGame.setScaleX(1.05);
-        joinGame.setScaleY(1.25);
-        joinGame.setTranslateX(6);
-        joinGame.setFont(Font.font("Verdana", 20));
-        joinGame.setTextAlignment(TextAlignment.CENTER);
-        joinGame.setOnMouseClicked( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event){
-                    
-                }
-            }); 
-        
-        Button hostGame = new Button();
-        hostGame.setFocusTraversable(false);
-        hostGame.setText("Multiplayer (Online)");
-        hostGame.setScaleY(1.25);
-        hostGame.setFont(Font.font("Verdana", 20));
-        hostGame.setTextAlignment(TextAlignment.CENTER);
-        hostGame.setOnMouseClicked( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event){
-                    
-                }
-            }); 
-        
-        VBox onlineOptions = new VBox(joinGame, hostGame);
-        onlineOptions.setSpacing(40);
-        onlineOptions.setTranslateX(500);
-        onlineOptions.setTranslateY(350);
-        
-        //control buttons
-        Button onlineHelp = new Button("HELP");
-        onlineHelp.setTextAlignment(TextAlignment.CENTER);
-        onlineHelp.setFocusTraversable(false);
-        onlineHelp.setScaleX(2.5);
-        onlineHelp.setScaleY(1.75);
-        onlineHelp.setTranslateX(25);
-        onlineHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event) {
-                    //Opens the instruction manual pdf through your Desktop's
-                    //default program for opening a pdf
-                           if (Desktop.isDesktopSupported()) {
-                    try {
-                    Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
-                    } catch (Exception e) {
-                    e.printStackTrace();
-                    }
-                    }
-
-                }
-            }); 
-            
-        Button onlineBack = new Button("BACK");
-        onlineBack.setTextAlignment(TextAlignment.CENTER);
-        onlineBack.setFocusTraversable(false);
-        onlineBack.setScaleX(2.35);
-        onlineBack.setScaleY(1.75);
-        onlineBack.setTranslateX(24);
-        onlineBack.setOnMouseClicked( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event){
-                    stage.setScene(mainMenu);
-                }
-            }); 
-
-        VBox onlineMacroButtons = new VBox(onlineHelp, onlineBack);
-        onlineMacroButtons.setSpacing(22);
-        onlineMacroButtons.setTranslateX(13);
-        onlineMacroButtons.setTranslateY(565);
-        
-        onlineRoot.getChildren().addAll(onlineScreenLogo, onlineOptions, onlineMacroButtons);
+        mainMenu.setFill(Color.GREEN);    
         
         //WINNER SCREEN
         ImageView winnerScreenLogo = new ImageView("./Resources/logo-Splendor.png");
@@ -678,6 +592,7 @@ public class Main extends Application
         mainMenuButton.setTranslateY(500);
         mainMenuButton.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    isSinglePlayer = false;
                     stage.setScene(mainMenu);
                 }
             }); 
@@ -722,6 +637,7 @@ public class Main extends Application
         playerSelectionBack.setTranslateX(24);
         playerSelectionBack.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    isSinglePlayer = false;
                     stage.setScene(mainMenu);
                 }
             }); 
@@ -934,7 +850,7 @@ public class Main extends Application
      * @param noble - the noble being purchased
      * @return 1 if the noble can be purchased, 0 if it cannot
      */
-    private int purchaseNoble(Noble noble){
+    private static int purchaseNoble(Noble noble){
         //creates a player variable for ease of reference
         Player player = players[activePlayer];
         
@@ -1531,9 +1447,21 @@ public class Main extends Application
      * @param player3Name - the name of player 3
      * @param player4Name - the name of player 4
      */
-    private void newGame(String player1Name, String player2Name, String player3Name, String player4Name) throws IOException{
+    private void newGame(String player1FieldContent, String player2FieldContent, String player3FieldContent, String player4FieldContent) throws IOException{
         players = new Player[numberOfPlayers];
         activePlayer = 0;
+        
+        String player1Name = player1FieldContent;
+        String player2Name = player2FieldContent;
+        String player3Name = player3FieldContent;
+        String player4Name = player4FieldContent;
+        
+        if(isSinglePlayer){
+        //sets the default names for AI players
+            player2Name = "Wallace";
+            player3Name = "Bruce";
+            player4Name = "Connor";        
+    }
         
         loadingWarning.setText(""); //resets the loading text
         
@@ -1561,14 +1489,14 @@ public class Main extends Application
         }
         
         //creates the players
-        players[0] = new Player(0, player1Name);
+        players[0] = new Player(0, player1Name, false);
         players[0].setActivePlayer();
-        players[1] = new Player(1, player2Name);
+        players[1] = new Player(1, player2Name, isSinglePlayer); // will be AI if in single player
         if(numberOfPlayers >= 3){
-            players[2] = new Player(2, player3Name);
+            players[2] = new Player(2, player3Name, isSinglePlayer); // will be AI if in single player
         }
         if (numberOfPlayers == 4){
-         players[3] = new Player(3, player4Name);   
+         players[3] = new Player(3, player4Name, isSinglePlayer); // will be AI if in single player   
         }
         
         //removes any existing play visuals from the scene
@@ -1648,7 +1576,7 @@ public class Main extends Application
         //sets the correct number of noble spaces in the market
         noblesMarket = new Noble[numberOfPlayers];
         
-        VBox availableNobles = new VBox();
+        availableNobles = new VBox();
         availableNobles.setTranslateX(820);
         availableNobles.setTranslateY(110);
         availableNobles.setSpacing(2);
@@ -1743,6 +1671,7 @@ public class Main extends Application
         playerNameTextField.setTranslateX(540);
         playerNameTextField.setTranslateY(350);        
         
+        if(!isSinglePlayer){
         //displays as many text fields as there are local players
         for (int i = 0; i < localPlayers; i++){            
             Label playerLabel = new Label("Player " + (i+1) + " Name");
@@ -1770,6 +1699,14 @@ public class Main extends Application
             
             playerNameTextField.getChildren().add(playerNameFields);
         }
+    }
+    else{
+        Label playerLabel = new Label("Player Name");
+        VBox playerNameFields = new VBox(playerLabel);
+        player1NameField.clear();
+        playerNameFields.getChildren().add(player1NameField);
+        playerNameTextField.getChildren().add(playerNameFields);
+    }
         
         //sets the scene
         Group enterNamesRoot = new Group(namesDone, enterNamesLogo, playerNameTextField, loadingWarning);
@@ -1785,5 +1722,36 @@ public class Main extends Application
                                    " (Must be 4 tokens of\n that type)\n\n" +
                                    "3. Reserve a card and\n take a Gold\n\n" +
                                    "4. Purchase a card");
+    }
+    
+    public static void doAITurn(int personality){
+        switch(personality){
+         case 1:
+         aiProtocol1();
+         break;
+         case 2:
+         aiProtocol1();
+         //aiProtocol2();
+         break;
+         case 3:
+         aiProtocol1();
+         //aiProtocol3();
+         break;
+        }
+    }
+    
+    public static void aiProtocol1(){
+        System.out.println("Doing behaviour set 1");
+        Main.nextTurn();        
+    }
+    
+    public static void aiProtocol2(){
+        System.out.println("Doing behaviour set 2");
+        Main.nextTurn();  
+    }
+    
+    public static void aiProtocol3(){
+        System.out.println("Doing behaviour set 3");
+        Main.nextTurn();  
     }
 }
