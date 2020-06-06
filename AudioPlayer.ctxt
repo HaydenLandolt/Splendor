@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=AudioPlayer
+comment1.params=file
+comment1.target=void\ play(java.io.File)
+comment1.text=\r\n\ \ Continuously\ plays\ the\ background\ music\ when\ called.\r\n\ \ \r\n\ \ @param\ file\ -\ the\ background\ music.\r\n
+comment2.params=file
+comment2.target=void\ playEffect(java.io.File)
+comment2.text=\r\n\ \ Plays\ an\ audio\ file\ passed\ to\ it\ by\ another\ method.\r\n\ \ \r\n\ \ @param\ file\ -\ the\ audio\ file\ to\ be\ played.\r\n
+comment3.params=
+comment3.target=void\ victoryFanfare()
+comment3.text=\r\n\ \ Stops\ the\ background\ music\ and\ plays\ the\ victory\ file.\r\n\ \ \r\n\ \ @param\ file\ -\ the\ background\ music.\r\n
+comment4.params=
+comment4.target=void\ stop()
+comment5.params=gain
+comment5.target=void\ setMusicVol(int)
+comment6.params=gain
+comment6.target=void\ setFXVol(int)
+comment7.params=
+comment7.target=int\ getMusicGain()
+comment8.params=
+comment8.target=int\ getFXGain()
+numComments=9

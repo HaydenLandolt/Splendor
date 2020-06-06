@@ -6,9 +6,13 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Stack;
 
 import java.util.concurrent.TimeUnit;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 
 import javafx.application.Application;
 
@@ -19,6 +23,7 @@ import javafx.scene.Group;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 
 import javafx.scene.effect.Glow;
@@ -48,7 +53,18 @@ import javafx.stage.Stage;
 public class Main extends Application
 {
     DeckGenerator deckGenerator = new DeckGenerator();
-    
+    static AudioPlayer audio = new AudioPlayer();
+
+    //Sound files
+    static File berwickCourt = new File("./Resources/Sounds/BerwickCourt.wav");
+    static File buttonClick = new File("./Resources/Sounds/buttonClick.wav");
+    static File cardDraw = new File("./Resources/Sounds/cardDraw.wav");
+    static File selectGem = new File("./Resources/Sounds/selectGem.wav");
+    static File scorePoint = new File("./Resources/Sounds/scorePoint.wav");
+
+    static boolean backgroundMusicIsPlaying = true;
+    static boolean soundEffectsAllowed = true;
+
     boolean isSinglePlayer = false;
 
     static int numberOfPlayers;
@@ -60,76 +76,78 @@ public class Main extends Application
     static int marketRuby;
     static int marketOnyx;
     static int marketGold = 5;
-    
+
     String player1Name = null;
     String player2Name = null;
     String player3Name = null;
     String player4Name = null;
-    
+
     TextField player1NameField = new TextField();
     TextField player2NameField = new TextField();
     TextField player3NameField = new TextField();
     TextField player4NameField = new TextField();
-    
+
     static Stage mainStage;
     static Scene mainScene;
     static Group root;
-    
-    ImageView level1DeckBack;
-    ImageView level2DeckBack;
-    ImageView level3DeckBack;
-    
+
+    static ImageView level1DeckBack;
+    static ImageView level2DeckBack;
+    static ImageView level3DeckBack;
+
     static Group winnerRoot;
     static Scene winnerScene;
     static Text victorText = new Text();
-    
+
     GemModels gemModels = new GemModels();
     static GridPane marketGemDisplay;
-    
+
     static Button mainMenuButton;
-    
+
     Scene mainMenu;
-    
+
     static Noble[] noblesMarket;
     static Stack<Noble> nobleDeck;
     static Stack<Card> level1Deck = new Stack<Card>();
     static Stack<Card> level2Deck = new Stack<Card>();
     static Stack<Card> level3Deck = new Stack<Card>();
-  
-    Card[] level1Market;
-    Card[] level2Market;
-    Card[] level3Market;
-    
+
+    static Card[] level1Market;
+    static Card[] level2Market;
+    static Card[] level3Market;
+
     static VBox availableNobles;
-    
-    HBox level1Available;
-    HBox level2Available;
-    HBox level3Available;
-    
+
+    static HBox level1Available;
+    static HBox level2Available;
+    static HBox level3Available;
+
     static GemType gem1Type;
     static GemType gem2Type;
     static GemType gem3Type;
-    
+
     static Group player1Group;
     static Group player2Group;
     static Group player3Group;
     static Group player4Group;
-    
+
     Button namesDone;
     Text loadingWarning = new Text();
-    
+
     static Text turnMarker;
     static Text instructions;
     static Text optionText;
 
-    static Player[] players;   
+    static Player[] players; 
+
+    static Random random = new Random();
 
     /**
      * Initializes and shows the main stage
      */
     public void start(Stage stage){                           
         mainStage = stage;
-        
+
         //create the instruction display
         Rectangle toolTipDisplay = new Rectangle(140, 275);        
         toolTipDisplay.setArcHeight(10);
@@ -137,21 +155,21 @@ public class Main extends Application
         toolTipDisplay.setStroke(Color.WHITE);
         toolTipDisplay.setStrokeWidth(3);
         toolTipDisplay.setFill(Color.DIMGREY);
-        
+
         turnMarker = new Text();
         turnMarker.setFont(Font.font("Verdana", 20));
         turnMarker.setTextAlignment(TextAlignment.CENTER);
         turnMarker.setFill(Color.WHITE);
         turnMarker.setTranslateX(25);
         turnMarker.setTranslateY(20);
-        
+
         Text turnText = new Text("Turn");
         turnText.setFont(Font.font("Verdana", 18));
         turnText.setTextAlignment(TextAlignment.CENTER);
         turnText.setFill(Color.WHITE);
         turnText.setTranslateX(45);
         turnText.setTranslateY(40);
-        
+
         //creates instructions
         instructions = new Text("Choose from one of\n the following actions:");
         instructions.setFont(Font.font("Verdana", 12));
@@ -159,20 +177,20 @@ public class Main extends Application
         instructions.setFill(Color.WHITE);
         instructions.setTranslateX(3);
         instructions.setTranslateY(60);
-        
+
         optionText = new Text("1. Take 3 gems of\n different types\n\n" +
-                                   "2. Take 2 gems of the\n same type\n" +
-                                   " (Must be 4 tokens of\n that type)\n\n" +
-                                   "3. Reserve a card and\n take a Gold\n\n" +
-                                   "4. Purchase a card");
+            "2. Take 2 gems of the\n same type\n" +
+            " (Must be 4 tokens of\n that type)\n\n" +
+            "3. Reserve a card and\n take a Gold\n\n" +
+            "4. Purchase a card");
         optionText.setFont(Font.font("Verdana", 12));
         optionText.setTextAlignment(TextAlignment.CENTER);
         optionText.setFill(Color.WHITE);
         optionText.setTranslateX(3);
         optionText.setTranslateY(95);
-        
+
         Group toolTipSection = new Group(toolTipDisplay, turnMarker, turnText,
-                                         instructions, optionText);
+                instructions, optionText);
         toolTipSection.setTranslateX(935);
         toolTipSection.setTranslateY(110); 
 
@@ -207,7 +225,7 @@ public class Main extends Application
         for (int i = 0; i < 6; i++){        
             PhongMaterial gemMat = new PhongMaterial();
             Group gemModelGroup = new Group();
-            
+
             //gets the gem model
             try {
                 switch(i){
@@ -351,7 +369,7 @@ public class Main extends Application
                 case 5:
                 gemModelGroup.setOnMousePressed( new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent event){
-                           System.out.println("Must reserve a card first");
+                            System.out.println("Must reserve a card first");
                         }
                     });
                 break;
@@ -376,10 +394,20 @@ public class Main extends Application
         level1DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
                     if(gem1Type == null){ //ensures play has not started selecting gems
-                    int success = players[activePlayer].addCardToHand(level1Deck.peek());
-                    if (success == 1){
-                        level1Deck.pop();
-                         if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
+                        int success = players[activePlayer].addCardToHand(level1Deck.peek());
+                        if (success == 1){
+                            level1Deck.pop();
+
+                            if(soundEffectsAllowed){
+                                try{
+                                    audio.playEffect(cardDraw);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
                                 players[activePlayer].addGem(GemType.GOLD);                        
@@ -394,24 +422,34 @@ public class Main extends Application
                             else {
                                 System.out.println("No more gems of that type");
                             }
-                        //advance to next player
-                        nextTurn();
-                    }
-                    else {
-                        instructions.setText("\n\n   Your hand is full");
-                        optionText.setText("");
+                            //advance to next player
+                            nextTurn();
+                        }
+                        else {
+                            instructions.setText("\n\n   Your hand is full");
+                            optionText.setText("");
+                        }
                     }
                 }
-            }
             });
         level2DeckBack = new ImageView("./Resources/CardBack_2.png");
         level2DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
                     if(gem1Type == null){ //ensures play has not started selecting gems
-                    int success = players[activePlayer].addCardToHand(level2Deck.peek());
-                    if (success == 1){
-                        level2Deck.pop();
-                         if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
+                        int success = players[activePlayer].addCardToHand(level2Deck.peek());
+                        if (success == 1){
+                            level2Deck.pop();
+
+                            if(soundEffectsAllowed){
+                                try{
+                                    audio.playEffect(cardDraw);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
                                 players[activePlayer].addGem(GemType.GOLD);                        
@@ -421,29 +459,39 @@ public class Main extends Application
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
                             else if(players[activePlayer].getTotalGems() == 10){
-                             System.out.println("Inventory full");   
+                                System.out.println("Inventory full");   
                             }
                             else {
                                 System.out.println("No more gems of that type");
                             }
-                        //advance to next player
-                        nextTurn();
+                            //advance to next player
+                            nextTurn();
+                        }
+                        else {
+                            instructions.setText("\n\n   Your hand is full");
+                            optionText.setText("");
+                        }
                     }
-                    else {
-                        instructions.setText("\n\n   Your hand is full");
-                        optionText.setText("");
-                    }
-                }
                 }
             });
         level3DeckBack = new ImageView("./Resources/CardBack_3.png");
         level3DeckBack.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
                     if(gem1Type == null){ //ensures play has not started selecting gems
-                    int success = players[activePlayer].addCardToHand(level3Deck.peek());
-                    if (success == 1){
-                        level3Deck.pop();
-                         if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
+                        int success = players[activePlayer].addCardToHand(level3Deck.peek());
+                        if (success == 1){
+                            level3Deck.pop();
+
+                            if(soundEffectsAllowed){
+                                try{
+                                    audio.playEffect(cardDraw);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
                                 players[activePlayer].addGem(GemType.GOLD);                        
@@ -458,15 +506,15 @@ public class Main extends Application
                             else {
                                 System.out.println("No more gems of that type");
                             }
-                        //advance to next player
-                        nextTurn();
-                    }
-                    else {
-                        instructions.setText("\n\n   Your hand is full");
-                        optionText.setText("");
+                            //advance to next player
+                            nextTurn();
+                        }
+                        else {
+                            instructions.setText("\n\n   Your hand is full");
+                            optionText.setText("");
+                        }
                     }
                 }
-            }
             });
 
         VBox marketDecks = new VBox(level1DeckBack, level2DeckBack, level3DeckBack);
@@ -480,24 +528,24 @@ public class Main extends Application
         //sets up the main scene.
         mainScene = new Scene(root, 1200, 650);
         mainScene.setFill(Color.GREEN);
-        
+
         //Online Setup scene setup
         Group onlineRoot = new Group();
         Scene onlineSetup = new Scene(onlineRoot, 1200, 650);
         onlineSetup.setFill(Color.GREEN);
-        
+
         //PLAYER SELECTION SETUP
         Group playerSelectionRoot = new Group();
         Scene playerSelection = new Scene(playerSelectionRoot, 1200, 650);
         playerSelection.setFill(Color.GREEN);
-        
+
         //MAIN MENU
         ImageView mainLogo = new ImageView("./Resources/logo-Splendor.png");
         mainLogo.setScaleX(0.5);
         mainLogo.setScaleY(0.5);
         mainLogo.setTranslateX(-550);
         mainLogo.setTranslateY(-250);
-               
+
         //select type of game buttons
         Button singlePlayer = new Button();
         singlePlayer.setFocusTraversable(false);
@@ -509,31 +557,49 @@ public class Main extends Application
         singlePlayer.setTextAlignment(TextAlignment.CENTER);
         singlePlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     isSinglePlayer = true;
                     stage.setScene(playerSelection);
                 }
             }); 
 
-        
-        Button multiplayerLocal = new Button();
-        multiplayerLocal.setFocusTraversable(false);
-        multiplayerLocal.setText("Multiplayer (Local)");
-        multiplayerLocal.setScaleX(1.05);
-        multiplayerLocal.setScaleY(1.25);
-        multiplayerLocal.setTranslateX(6);
-        multiplayerLocal.setFont(Font.font("Verdana", 20));
-        multiplayerLocal.setTextAlignment(TextAlignment.CENTER);
-        multiplayerLocal.setOnMouseClicked( new EventHandler<MouseEvent>() {
+        Button multiplayer = new Button();
+        multiplayer.setFocusTraversable(false);
+        multiplayer.setText("Multiplayer");
+        multiplayer.setScaleX(1.63);
+        multiplayer.setScaleY(1.25);
+        multiplayer.setTranslateX(43);
+        multiplayer.setFont(Font.font("Verdana", 20));
+        multiplayer.setTextAlignment(TextAlignment.CENTER);
+        multiplayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    isSinglePlayer = false;
                     stage.setScene(playerSelection);
                 }
             }); 
-        
-        VBox mainMenuOptions = new VBox(singlePlayer, multiplayerLocal);
+
+        VBox mainMenuOptions = new VBox(singlePlayer, multiplayer);
         mainMenuOptions.setSpacing(40);
         mainMenuOptions.setTranslateX(500);
         mainMenuOptions.setTranslateY(400);
-        
+
         //control buttons
         Button mainMenuHelp = new Button("HELP");
         mainMenuHelp.setTextAlignment(TextAlignment.CENTER);
@@ -543,14 +609,23 @@ public class Main extends Application
         mainMenuHelp.setTranslateX(25);
         mainMenuHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     //Opens the instruction manual pdf through your Desktop's
                     //default program for opening a pdf
-                           if (Desktop.isDesktopSupported()) {
-                    try {
-                    Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
-                    } catch (Exception e) {
-                    e.printStackTrace();
-                    }
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                 }
@@ -564,26 +639,57 @@ public class Main extends Application
         mainMenuExit.setTranslateX(27);
         mainMenuExit.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     System.exit(0);
                 }
             }); 
 
-        VBox mainMacroButtons = new VBox(mainMenuHelp, mainMenuExit);
+        Button soundMenu = new Button("SOUND");
+        soundMenu.setTextAlignment(TextAlignment.CENTER);
+        soundMenu.setFocusTraversable(false);
+        soundMenu.setScaleX(1.75);
+        soundMenu.setScaleY(1.75);
+        soundMenu.setTranslateX(1100);
+        soundMenu.setTranslateY(-50);
+        soundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    openSoundControls();
+                }
+            }); 
+
+        VBox mainMacroButtons = new VBox(mainMenuHelp, mainMenuExit, soundMenu);
         mainMacroButtons.setSpacing(22);
         mainMacroButtons.setTranslateX(13);
         mainMacroButtons.setTranslateY(565);
-        
+
         Group mainMenuRoot = new Group(mainLogo, mainMenuOptions, mainMacroButtons);
         mainMenu = new Scene(mainMenuRoot, 1200, 650);
         mainMenu.setFill(Color.GREEN);    
-        
+
         //WINNER SCREEN
         ImageView winnerScreenLogo = new ImageView("./Resources/logo-Splendor.png");
         winnerScreenLogo.setScaleX(0.5);
         winnerScreenLogo.setScaleY(0.5);
         winnerScreenLogo.setTranslateX(-550);
         winnerScreenLogo.setTranslateY(-250);
-        
+
         mainMenuButton = new Button("Main Menu");
         mainMenuButton.setTextAlignment(TextAlignment.CENTER);
         mainMenuButton.setScaleX(2);
@@ -592,22 +698,31 @@ public class Main extends Application
         mainMenuButton.setTranslateY(500);
         mainMenuButton.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     isSinglePlayer = false;
                     stage.setScene(mainMenu);
                 }
             }); 
-        
+
         winnerRoot = new Group(mainMenuButton, winnerScreenLogo);
         winnerScene = new Scene(winnerRoot, 1200, 650);
         winnerScene.setFill(Color.GREEN);
-            
+
         //PLAYER SELECTION
         ImageView playerSelectionLogo = new ImageView("./Resources/logo-Splendor.png");
         playerSelectionLogo.setScaleX(0.5);
         playerSelectionLogo.setScaleY(0.5);
         playerSelectionLogo.setTranslateX(-550);
         playerSelectionLogo.setTranslateY(-250);
-        
+
         Button playerSelectionHelp = new Button("HELP");
         playerSelectionHelp.setTextAlignment(TextAlignment.CENTER);
         playerSelectionHelp.setFocusTraversable(false);
@@ -616,14 +731,23 @@ public class Main extends Application
         playerSelectionHelp.setTranslateX(25);
         playerSelectionHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     //Opens the instruction manual pdf through your Desktop's
                     //default program for opening a pdf
-                           if (Desktop.isDesktopSupported()) {
-                    try {
-                    Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
-                    } catch (Exception e) {
-                    e.printStackTrace();
-                    }
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                 }
@@ -637,16 +761,47 @@ public class Main extends Application
         playerSelectionBack.setTranslateX(24);
         playerSelectionBack.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     isSinglePlayer = false;
                     stage.setScene(mainMenu);
                 }
             }); 
 
-        VBox playerSelectionMacroButtons = new VBox(playerSelectionHelp, playerSelectionBack);
+        Button playerSelectSoundMenu = new Button("SOUND");
+        playerSelectSoundMenu.setTextAlignment(TextAlignment.CENTER);
+        playerSelectSoundMenu.setFocusTraversable(false);
+        playerSelectSoundMenu.setScaleX(1.75);
+        playerSelectSoundMenu.setScaleY(1.75);
+        playerSelectSoundMenu.setTranslateX(1100);
+        playerSelectSoundMenu.setTranslateY(-50);
+        playerSelectSoundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    openSoundControls();
+                }
+            }); 
+
+        VBox playerSelectionMacroButtons = new VBox(playerSelectionHelp, playerSelectionBack, playerSelectSoundMenu);
         playerSelectionMacroButtons.setSpacing(22);
         playerSelectionMacroButtons.setTranslateX(13);
         playerSelectionMacroButtons.setTranslateY(565);
-        
+
         //buttons to select the number of players
         Button twoPlayer = new Button();
         twoPlayer.setFocusTraversable(false);
@@ -658,16 +813,25 @@ public class Main extends Application
         twoPlayer.setTextAlignment(TextAlignment.CENTER);
         twoPlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     numberOfPlayers = 2;
                     try{
-                    enterPlayerNames(2);
-                }
-                catch(IOException e){
-                e.printStackTrace();
-            }
+                        enterPlayerNames(2);
+                    }
+                    catch(IOException e){
+                        e.printStackTrace();
+                    }
                 }
             }); 
-      
+
         Button threePlayer = new Button();
         threePlayer.setFocusTraversable(false);
         threePlayer.setText("3 Players");
@@ -678,16 +842,25 @@ public class Main extends Application
         threePlayer.setTextAlignment(TextAlignment.CENTER);
         threePlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     numberOfPlayers = 3;
                     try{
-                    enterPlayerNames(3);
-                }
-                catch(IOException e){
-                e.printStackTrace();
-            }
+                        enterPlayerNames(3);
+                    }
+                    catch(IOException e){
+                        e.printStackTrace();
+                    }
                 }
             }); 
-        
+
         Button fourPlayer = new Button();
         fourPlayer.setFocusTraversable(false);
         fourPlayer.setText("4 Players");
@@ -698,23 +871,32 @@ public class Main extends Application
         fourPlayer.setTextAlignment(TextAlignment.CENTER);
         fourPlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     numberOfPlayers = 4;
                     try{
-                    enterPlayerNames(4);
-                }
-                catch(IOException e){
-                e.printStackTrace();
-            }
+                        enterPlayerNames(4);
+                    }
+                    catch(IOException e){
+                        e.printStackTrace();
+                    }
                 }
             }); 
-            
+
         VBox playerOptions = new VBox(twoPlayer, threePlayer, fourPlayer);
         playerOptions.setSpacing(40);
         playerOptions.setTranslateX(500);
         playerOptions.setTranslateY(350);
-        
+
         playerSelectionRoot.getChildren().addAll(playerSelectionLogo, playerOptions, playerSelectionMacroButtons);
-            
+
         //ENTERING PLAYER NAMES
         namesDone = new Button("DONE");
         namesDone.setTextAlignment(TextAlignment.CENTER);
@@ -726,6 +908,15 @@ public class Main extends Application
         //creates the loading warning
         namesDone.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     loadingWarning.setText("Loading... Please Wait");
                     loadingWarning.setFill(Color.YELLOW);
                     loadingWarning.setFont(Font.font("Verdana", 30));
@@ -741,10 +932,18 @@ public class Main extends Application
                             player3NameField.getText(), player4NameField.getText());
                     }
                     catch(IOException e){
-                    e.printStackTrace();
+                        e.printStackTrace();
                     }
                 }
             }); 
+
+        //starts the backgroundMusic
+        try{
+        audio.play(berwickCourt);
+    }
+    catch (Exception e){
+        e.printStackTrace();
+    }
         
         //starts the window
         stage.setTitle("Splendor");
@@ -771,10 +970,10 @@ public class Main extends Application
      */
     private static int purchaseCard(Card card){
         Player player = players[activePlayer]; //creates a player variable for easier reference
-        
+
         //gets the gems available for market from the player
         ArrayList<GemType> gems = player.getGemsForMarket();
-        
+
         int difference = 0;
         int diamond = 0;
         int sapphire = 0;
@@ -782,66 +981,66 @@ public class Main extends Application
         int ruby = 0;
         int onyx = 0;
         int gold = 0;
-        
+
         //determines the exact gems available for market
         for(int i = 0; i < gems.size(); i++){
             GemType gemForMarketType = gems.get(i);
             switch(gemForMarketType){
-             case DIAMOND:
-             diamond++;
-             break;
-             case SAPPHIRE:
-             sapphire++;
-             break;
-             case EMERALD:
-             emerald++;
-             break;
-             case RUBY:
-             ruby++;
-             break;
-             case ONYX:
-             onyx++;
-             break;
-             case GOLD:
-             gold++;
+                case DIAMOND:
+                diamond++;
+                break;
+                case SAPPHIRE:
+                sapphire++;
+                break;
+                case EMERALD:
+                emerald++;
+                break;
+                case RUBY:
+                ruby++;
+                break;
+                case ONYX:
+                onyx++;
+                break;
+                case GOLD:
+                gold++;
             }
         }
-        
+
         //determines if the number of gems selected is enough to cover the
         //cost of the card, or if gold tokens are required (difference)
         diamond -= card.getDiamondCost() - player.getDiamondCards();
         if (diamond < 0){
-         difference += Math.abs(diamond);
-         diamond = 0;
+            difference += Math.abs(diamond);
+            diamond = 0;
         }
         sapphire -= card.getSapphireCost() - player.getSapphireCards();
         if (sapphire < 0){
-         difference += Math.abs(sapphire);
-         sapphire = 0;
+            difference += Math.abs(sapphire);
+            sapphire = 0;
         }
         emerald -= card.getEmeraldCost() - player.getEmeraldCards();
         if (emerald < 0){
-         difference += Math.abs(emerald);
-         emerald = 0;
+            difference += Math.abs(emerald);
+            emerald = 0;
         }
         ruby -= card.getRubyCost() - player.getRubyCards();
         if (ruby < 0){
-         difference += Math.abs(ruby);
-         ruby = 0;
+            difference += Math.abs(ruby);
+            ruby = 0;
         }
         onyx -= card.getOnyxCost() - player.getOnyxCards();
         if (onyx < 0){
-         difference += Math.abs(onyx);
-         onyx = 0;
+            difference += Math.abs(onyx);
+            onyx = 0;
         }
-        
+
         //if there is enough gold to make up the difference,
         // the card can be purchased
         if (gold >= difference)        
-        return 1;
+            return 1;
         else
-        return 0;
-        
+            return 0;
+
     }
 
     /**
@@ -853,7 +1052,7 @@ public class Main extends Application
     private static int purchaseNoble(Noble noble){
         //creates a player variable for ease of reference
         Player player = players[activePlayer];
-        
+
         //checks to see if a player has enough bonuses and does
         //not already have a noble
         if(player.getHasNoble())
@@ -885,7 +1084,7 @@ public class Main extends Application
         marketGemDisplay.getChildren().get(4).setVisible(marketOnyx > 0);
         marketGemDisplay.getChildren().get(5).setVisible(marketGold > 0);
     }
-    
+
     /**
      * Adds functionality to the cards in the market.
      * 
@@ -896,37 +1095,46 @@ public class Main extends Application
      * @param deck - the appropriate deck from which a replacement card is to be drawn
      * @param marketView - the array of cards that are available in the appropriate level
      */
-    private void addMarketCardFunction(HBox marketDisplay, int index, Card card, Group cardVisuals, Stack<Card> deck, Card[] marketView){
-         cardVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent event){
-                        if(gem1Type == null){ //ensures play has not started selecting gems
+    private static void addMarketCardFunction(HBox marketDisplay, int index, Card card, Group cardVisuals, Stack<Card> deck, Card[] marketView){
+        cardVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    if(gem1Type == null){ //ensures play has not started selecting gems
                         if(event.getButton() == MouseButton.PRIMARY){
                             int success = purchaseCard(card);
                             if (success == 1){ // if the card can be purchased
                                 if(!deck.isEmpty()){ //if the deck is not empty
-                                 marketDisplay.getChildren().remove(index); //remove the card
-                            }
+                                    marketDisplay.getChildren().remove(index); //remove the card
+                                }
                                 else{ // the deck is empty therefore make the deck back
                                     // invisible to reflect an empty deck
                                     if( deck == level1Deck){
-                                    level1DeckBack.setVisible(false);
+                                        level1DeckBack.setVisible(false);
+                                    }
+                                    else if( deck == level2Deck){
+                                        level2DeckBack.setVisible(false);
+                                    }
+                                    else{
+                                        level3DeckBack.setVisible(false);
+                                    }
+                                    //set the card visuals to invisible as the card will not be replaced
+                                    marketDisplay.getChildren().get(index).setVisible(false);
                                 }
-                                else if( deck == level2Deck){
-                                    level2DeckBack.setVisible(false);
-                                }
-                                else{
-                                    level3DeckBack.setVisible(false);
-                                }
-                                //set the card visuals to invisible as the card will not be replaced
-                                marketDisplay.getChildren().get(index).setVisible(false);
-                            }
                                 players[activePlayer].addCard(card); // card is added to the player
                                 players[activePlayer].spendGems(returnGems(card)); //gems are spent
-                                
+
+                                if(soundEffectsAllowed){
+                                    try{
+                                        audio.playEffect(cardDraw);
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+
                                 //a new card is drawn to replace it
                                 Card newCard = deck.pop();
                                 Group newCardVisuals = newCard.getVisuals();
-                                
+
                                 //***************
                                 //!!!RECURSION!!!
                                 //***************
@@ -934,46 +1142,55 @@ public class Main extends Application
                                 addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
                                 marketView[index] = newCard;
                                 marketDisplay.getChildren().add(index, newCardVisuals);
-                   
+
                                 nextTurn();
                             }
                             else {
                                 //show some warning... (not the following)
                                 instructions.setText("\n\n   Not enough gems");
-                            optionText.setText("");
+                                optionText.setText("");
                             }
                         }
                         else{
                             int success = players[activePlayer].addCardToHand(card);
                             if (success == 1){ // if the card can be added to the hand
                                 if(!deck.isEmpty()) //if the deck is not empty
-                                marketDisplay.getChildren().remove(index); //remove the card
+                                    marketDisplay.getChildren().remove(index); //remove the card
                                 else // the deck is empty therefore make the deck back
-                                marketDisplay.getChildren().get(index).setVisible(false);
-                                
+                                    marketDisplay.getChildren().get(index).setVisible(false);
+
                                 //add a gold token to the players inventory if there is
                                 //space and a gold token is available to be taken from
                                 //the market
-                                 if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
-                                marketGold--;
-                                updateGemVisuals();
-                                players[activePlayer].addGem(GemType.GOLD);                        
-                            }
-                            else if(marketGold > 1 && players[activePlayer].getTotalGems() < 10){
-                                marketGold--;
-                                players[activePlayer].addGem(GemType.GOLD);
-                            }
-                            else if (players[activePlayer].getTotalGems() == 10){
-                                System.out.println("Inventory Full");
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
-                            
+                                if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
+                                    marketGold--;
+                                    updateGemVisuals();
+                                    players[activePlayer].addGem(GemType.GOLD);                        
+                                }
+                                else if(marketGold > 1 && players[activePlayer].getTotalGems() < 10){
+                                    marketGold--;
+                                    players[activePlayer].addGem(GemType.GOLD);
+                                }
+                                else if (players[activePlayer].getTotalGems() == 10){
+                                    System.out.println("Inventory Full");
+                                }
+                                else {
+                                    System.out.println("No more gems of that type");
+                                }
+
+                                if(soundEffectsAllowed){
+                                    try{
+                                        audio.playEffect(cardDraw);
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+
                                 //a new card is drawn to replace it
                                 Card newCard = deck.pop();
                                 Group newCardVisuals = newCard.getVisuals();
-                                
+
                                 //***************
                                 //!!!RECURSION!!!
                                 //***************
@@ -981,21 +1198,21 @@ public class Main extends Application
                                 addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
                                 marketView[index] = newCard;
                                 marketDisplay.getChildren().add(index, newCardVisuals);
-                                
+
                                 nextTurn();
                             }
                             else {
                                 //show some warning... (not the following)
                                 instructions.setText("\n\n   Your hand is full");
-                            optionText.setText("");
+                                optionText.setText("");
                             }
                         }
                     }
                 }
-                });
+            });
 
     }
-    
+
     /**
      * Returns gems to the user after a purchase.
      * 
@@ -1004,12 +1221,12 @@ public class Main extends Application
      */
     private static ArrayList<GemType> returnGems(Card card){
         Player player = players[activePlayer]; // creates a player variable for ease of reference 
-       
+
         //gets the list of gems available for market
         ArrayList<GemType> gems = player.getGemsForMarket();
-        
+
         int difference = 0;
-        
+
         //determines the cost of the cards in actual gems when accounting
         //for bonuses
         int diamondCost = Math.max(0, card.getDiamondCost() - player.getDiamondCards());
@@ -1017,139 +1234,139 @@ public class Main extends Application
         int emeraldCost = Math.max(0, card.getEmeraldCost() - player.getEmeraldCards());
         int rubyCost = Math.max(0, card.getRubyCost() - player.getRubyCards());
         int onyxCost = Math.max(0, card.getOnyxCost() - player.getOnyxCards());
-        
+
         int diamondForMarket = 0;
         int sapphireForMarket = 0;
         int emeraldForMarket = 0;
         int rubyForMarket = 0;
         int onyxForMarket = 0;
         int goldForMarket = 0;
-        
+
         //determines the exact number of gems available for the market
         for (int i = 0; i < gems.size(); i++){
             GemType gemType = gems.get(i);
             switch(gemType){
-             case DIAMOND:
-             diamondForMarket++;
-             break;
-             case SAPPHIRE:
-             sapphireForMarket++;
-             break;
-             case EMERALD:
-             emeraldForMarket++;
-             break;
-             case RUBY:
-             rubyForMarket++;
-             break;
-             case ONYX:
-             onyxForMarket++;
-             break;
-             case GOLD:
-             goldForMarket++;
-             break;
+                case DIAMOND:
+                diamondForMarket++;
+                break;
+                case SAPPHIRE:
+                sapphireForMarket++;
+                break;
+                case EMERALD:
+                emeraldForMarket++;
+                break;
+                case RUBY:
+                rubyForMarket++;
+                break;
+                case ONYX:
+                onyxForMarket++;
+                break;
+                case GOLD:
+                goldForMarket++;
+                break;
             }
         }
-        
+
         int goldCost = 0;
-        
+
         int leftoverDiamonds = 0;
         int leftoverSapphires = 0;
         int leftoverEmeralds = 0;
         int leftoverRubies = 0;
         int leftoverOnyx = 0;
         int leftoverGold = 0;        
-        
+
         //determines the number of excess gems
         if(diamondCost - diamondForMarket > 0){
-        goldCost += diamondCost - diamondForMarket;
-        marketDiamond += diamondForMarket;
-    }
+            goldCost += diamondCost - diamondForMarket;
+            marketDiamond += diamondForMarket;
+        }
         else if(diamondCost - diamondForMarket < 0){
-        leftoverDiamonds += diamondForMarket - diamondCost;
-        marketDiamond += diamondForMarket - leftoverDiamonds;
-    }
+            leftoverDiamonds += diamondForMarket - diamondCost;
+            marketDiamond += diamondForMarket - leftoverDiamonds;
+        }
         else
-        marketDiamond += diamondForMarket;        
-            if(sapphireCost - sapphireForMarket > 0){
-        goldCost += sapphireCost - sapphireForMarket;
-        marketSapphire += sapphireForMarket;
-    }
+            marketDiamond += diamondForMarket;        
+        if(sapphireCost - sapphireForMarket > 0){
+            goldCost += sapphireCost - sapphireForMarket;
+            marketSapphire += sapphireForMarket;
+        }
         else if(sapphireCost - sapphireForMarket < 0){
-        leftoverSapphires += sapphireForMarket - sapphireCost;
-        marketSapphire += sapphireForMarket - leftoverSapphires;
-    }
+            leftoverSapphires += sapphireForMarket - sapphireCost;
+            marketSapphire += sapphireForMarket - leftoverSapphires;
+        }
         else
-        marketSapphire += sapphireForMarket;
-            if(emeraldCost - emeraldForMarket > 0){
-        goldCost += emeraldCost - emeraldForMarket;
-        marketEmerald += emeraldForMarket;
-    }
+            marketSapphire += sapphireForMarket;
+        if(emeraldCost - emeraldForMarket > 0){
+            goldCost += emeraldCost - emeraldForMarket;
+            marketEmerald += emeraldForMarket;
+        }
         else if(emeraldCost - emeraldForMarket < 0){
-        leftoverEmeralds += emeraldForMarket - emeraldCost;
-        marketEmerald += emeraldForMarket - leftoverEmeralds;
-    }
+            leftoverEmeralds += emeraldForMarket - emeraldCost;
+            marketEmerald += emeraldForMarket - leftoverEmeralds;
+        }
         else
-        marketEmerald += emeraldForMarket;
-            if(rubyCost - rubyForMarket > 0){
-        goldCost += rubyCost - rubyForMarket;
-        marketRuby += rubyForMarket;
-    }
+            marketEmerald += emeraldForMarket;
+        if(rubyCost - rubyForMarket > 0){
+            goldCost += rubyCost - rubyForMarket;
+            marketRuby += rubyForMarket;
+        }
         else if(rubyCost - rubyForMarket < 0){
-        leftoverRubies += rubyForMarket - rubyCost;
-        marketRuby += rubyForMarket - leftoverRubies;
-    }
+            leftoverRubies += rubyForMarket - rubyCost;
+            marketRuby += rubyForMarket - leftoverRubies;
+        }
         else
-        marketRuby += rubyForMarket;
-            if(onyxCost - onyxForMarket > 0){
-        onyxCost += onyxCost - onyxForMarket;
-        marketOnyx += onyxForMarket;
-    }
+            marketRuby += rubyForMarket;
+        if(onyxCost - onyxForMarket > 0){
+            onyxCost += onyxCost - onyxForMarket;
+            marketOnyx += onyxForMarket;
+        }
         else if(onyxCost - onyxForMarket < 0){
-        leftoverOnyx += onyxForMarket - onyxCost;
-        marketOnyx += onyxForMarket - leftoverOnyx;
-    }
+            leftoverOnyx += onyxForMarket - onyxCost;
+            marketOnyx += onyxForMarket - leftoverOnyx;
+        }
         else
-        marketOnyx += onyxForMarket;
+            marketOnyx += onyxForMarket;
         if(goldCost - goldForMarket < 0){
-        leftoverGold += goldForMarket - goldCost;
-        marketGold += goldForMarket - leftoverGold;
-    }
+            leftoverGold += goldForMarket - goldCost;
+            marketGold += goldForMarket - leftoverGold;
+        }
         else
-        marketGold += goldForMarket;
-        
+            marketGold += goldForMarket;
+
         //creates a list of the unused gems
         ArrayList<GemType> leftoverGems = new ArrayList<GemType>();
         if(leftoverDiamonds > 0){
-         for (int i = 0; i < leftoverDiamonds; i++)
-            leftoverGems.add(GemType.DIAMOND);
+            for (int i = 0; i < leftoverDiamonds; i++)
+                leftoverGems.add(GemType.DIAMOND);
         }
         if(leftoverSapphires > 0){
-         for (int i = 0; i < leftoverSapphires; i++)
-            leftoverGems.add(GemType.SAPPHIRE);
+            for (int i = 0; i < leftoverSapphires; i++)
+                leftoverGems.add(GemType.SAPPHIRE);
         }
         if(leftoverEmeralds > 0){
-         for (int i = 0; i < leftoverEmeralds; i++)
-            leftoverGems.add(GemType.EMERALD);
+            for (int i = 0; i < leftoverEmeralds; i++)
+                leftoverGems.add(GemType.EMERALD);
         }
         if(leftoverRubies > 0){
-         for (int i = 0; i < leftoverRubies; i++)
-            leftoverGems.add(GemType.RUBY);
+            for (int i = 0; i < leftoverRubies; i++)
+                leftoverGems.add(GemType.RUBY);
         }
         if(leftoverOnyx > 0){
-         for (int i = 0; i < leftoverOnyx; i++)
-            leftoverGems.add(GemType.ONYX);
+            for (int i = 0; i < leftoverOnyx; i++)
+                leftoverGems.add(GemType.ONYX);
         }
         if(leftoverGold > 0){
-         for (int i = 0; i < leftoverGold; i++)
-            leftoverGems.add(GemType.GOLD);
+            for (int i = 0; i < leftoverGold; i++)
+                leftoverGems.add(GemType.GOLD);
         }
-        
+
         //updates the market gem display to reflect the return of gems
         updateGemVisuals();
-        
+
         return leftoverGems;
     }
-    
+
     /**
      * Adds functionality to the card in a player's hand
      * 
@@ -1160,49 +1377,60 @@ public class Main extends Application
      */
     public static void addCardInHandFunction(Group cardVisuals, Card card, HBox cardsInHand, int index){
         cardVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
-                    public void handle(MouseEvent event){
-                        if(gem1Type == null){ //ensures play has not started selecting gems
+                public void handle(MouseEvent event){
+                    if(gem1Type == null){ //ensures play has not started selecting gems
                         int success = purchaseCard(card);
-                            if (success == 1){  //if the card can be purchased                       
-                                cardsInHand.getChildren().get(index).setVisible(false); //remove the card visuals from the hand
-                                players[activePlayer].addCard(card); //applies the card to the player
-                                players[activePlayer].spendGems(returnGems(card)); // spends gems
-                                players[activePlayer].removeCardFromHand(index); // removes the cards from the hand
-                                nextTurn();
+                        if (success == 1){  //if the card can be purchased                       
+                            cardsInHand.getChildren().get(index).setVisible(false); //remove the card visuals from the hand
+                            players[activePlayer].addCard(card); //applies the card to the player
+                            players[activePlayer].spendGems(returnGems(card)); // spends gems
+                            players[activePlayer].removeCardFromHand(index); // removes the cards from the hand
+
+                            if(soundEffectsAllowed){
+                                try{
+                                    audio.playEffect(cardDraw);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
                             }
-                            else {
-                                //show some warning... (not the following)
-                                instructions.setText("\n\n   Not enough gems");
+
+                            nextTurn();
+                        }
+                        else {
+                            //show some warning... (not the following)
+                            instructions.setText("\n\n   Not enough gems");
                             optionText.setText("");
-                            }
                         }
                     }
-    });
-}
-
-/**
- * Starts the next turn
- */
-    public static void nextTurn(){
-     players[activePlayer].setUnactivePlayer();
-     
-     //Updates the active player
-     activePlayer++;
-     //Checks if there is a winner
-     if(activePlayer == numberOfPlayers){
-         String winnerName = checkIfWinner();     
-         if(winnerName == null)
-         activePlayer = 0;
-         else
-         winner(winnerName);
-        }
-     players[activePlayer].setActivePlayer();
-     
-     //updates the text in the tooltip display
-     turnMarker.setText(players[activePlayer].getName()  + "'s");
-     resetInstructions();
+                }
+            });
     }
-    
+
+    /**
+     * Starts the next turn
+     */
+    public static void nextTurn(){
+        players[activePlayer].setUnactivePlayer();
+
+        //Updates the active player
+        activePlayer++;
+        //Checks if there is a winner
+        if(activePlayer == numberOfPlayers){
+            String winnerName = checkIfWinner();     
+            if(winnerName == null)
+                activePlayer = 0;
+            else
+                winner(winnerName);
+                
+        }
+        players[activePlayer].setActivePlayer();
+
+        //updates the text in the tooltip display
+        turnMarker.setText(players[activePlayer].getName()  + "'s");
+        resetInstructions();
+    }
+
     /**
      * Checks if there is a winner.
      *
@@ -1210,17 +1438,17 @@ public class Main extends Application
      */
     private static String checkIfWinner(){
         ArrayList<Player> victoriousPlayers = new ArrayList<Player>();
-        
+
         //checks to see which players are victorious
         for(int i = 0; i < players.length; i++){
-         if(players[i].getVP() >= 15)
-            victoriousPlayers.add(players[i]);
+            if(players[i].getVP() >= 15)
+                victoriousPlayers.add(players[i]);
         }
-        
+
         if(victoriousPlayers.size() == 0)
-        return null; // no winners
+            return null; // no winners
         else if(victoriousPlayers.size() == 1)
-        return victoriousPlayers.get(0).getName(); // one winner
+            return victoriousPlayers.get(0).getName(); // one winner
         else{
             //breaks the tie if there are multiple potential winners
             Player lowestDevCards = null;
@@ -1233,211 +1461,227 @@ public class Main extends Application
                     tiedDevCards = victoriousPlayers.get(i);
                 }
             }
-            
+
             if(tiedDevCards == null){
-             return lowestDevCards.getName();   
+                return lowestDevCards.getName();   
             }
             else if (lowestDevCards.getTotalDevCards() == tiedDevCards.getTotalDevCards()){
-               return "Tie";
+                return "Tie";
             }
             else{
-             return lowestDevCards.getName();   
+                return lowestDevCards.getName();   
             }
         }
     }
-    
+
     /**
      * Adds a gem to the player and removes it from the market
      * 
      * @param gem - the type of gem being taken
      * @return 0 if taking the gem is unsuccessful, 1 if taking the gem does not end the turn, and 2 if it does
      */
-    private int takeGem(GemType gem){
+    private static int takeGem(GemType gem){
         if(players[activePlayer].getTotalGems() == 10) //checks to see if a player's inventory is full
-        return 0;
-        
+            return 0;
+
         //checks how many different types of gems are available
         int difGemTypesAvailable = 0;
         if (marketDiamond > 0)
-        difGemTypesAvailable++;
+            difGemTypesAvailable++;
         if (marketSapphire > 0)
-        difGemTypesAvailable++;
+            difGemTypesAvailable++;
         if (marketEmerald > 0)
-        difGemTypesAvailable++;
+            difGemTypesAvailable++;
         if (marketRuby > 0)
-        difGemTypesAvailable++;
+            difGemTypesAvailable++;
         if (marketOnyx > 0)
-        difGemTypesAvailable++;
-        
-        
+            difGemTypesAvailable++;
+
         if(gem1Type == null) //first gem is always allowed
-        gem1Type = gem;
+            gem1Type = gem;
         else if(gem2Type == null){
             if(gem == gem1Type && gem1Type != null){ //if the player is trying to take two gems of the same type
                 //make sure there were initially 4 gems of that type in the market
                 switch(gem){
-                 case DIAMOND:
-                 if(marketDiamond < 3){
-                     return 0;
+                    case DIAMOND:
+                    if(marketDiamond < 3){
+                        return 0;
                     }
                     else
-                    gem2Type = gem;
-                 break;
-                 case SAPPHIRE:
-                 if(marketSapphire < 3){
-                     return 0;
+                        gem2Type = gem;
+                    break;
+                    case SAPPHIRE:
+                    if(marketSapphire < 3){
+                        return 0;
                     }
                     else
-                    gem2Type = gem;
-                 break;
-                 case EMERALD:
-                 if(marketEmerald < 3){
-                     return 0;
+                        gem2Type = gem;
+                    break;
+                    case EMERALD:
+                    if(marketEmerald < 3){
+                        return 0;
                     }
                     else
-                    gem2Type = gem;
-                 break;
-                 case RUBY:
-                 if(marketRuby < 3){
-                     return 0;
+                        gem2Type = gem;
+                    break;
+                    case RUBY:
+                    if(marketRuby < 3){
+                        return 0;
                     }
                     else
-                    gem2Type = gem;
-                 break;
-                 case ONYX:
-                 if(marketOnyx < 3){
-                     return 0;
+                        gem2Type = gem;
+                    break;
+                    case ONYX:
+                    if(marketOnyx < 3){
+                        return 0;
                     }
                     else
-                    gem2Type = gem;
-                 break;
+                        gem2Type = gem;
+                    break;
                 }
             }
             else
-            gem2Type = gem;
+                gem2Type = gem;
         }
         else{
             if (gem1Type == gem || gem2Type == gem){ //makes sure the player isn't trying to double up on a type of gem
-             return 0;   
+                return 0;   
             }
             else{
-             gem3Type = gem;   
+                gem3Type = gem;   
             }
         }
-        
+
         switch(gem){
-         case DIAMOND:
-         marketDiamond--;
-         break;
-         case SAPPHIRE:
-         marketSapphire--;
-         break;
-         case EMERALD:
-         marketEmerald--;
-         break;
-         case RUBY:
-         marketRuby--;
-         break;
-         case ONYX:
-         marketOnyx--;
-         break;
-         case GOLD:
-         marketGold--;
-         break;
+            case DIAMOND:
+            marketDiamond--;
+            break;
+            case SAPPHIRE:
+            marketSapphire--;
+            break;
+            case EMERALD:
+            marketEmerald--;
+            break;
+            case RUBY:
+            marketRuby--;
+            break;
+            case ONYX:
+            marketOnyx--;
+            break;
+            case GOLD:
+            marketGold--;
+            break;
         }
         players[activePlayer].addGem(gem);        
-        
+
         if (gem2Type != null && gem2Type != gem1Type){
-         instructions.setText("\n    Select one more \nunique gem");
-         optionText.setText("");
+            instructions.setText("\n    Select one more \nunique gem");
+            optionText.setText("");
         }
         else if(gem1Type != null && difGemTypesAvailable == 2){
             instructions.setText("\n    Select one more \nunique gem");
-         optionText.setText("");
+            optionText.setText("");
         }
         else if(gem1Type != null){
-         instructions.setText("\n  Select two more \nunique gems \n\n or \n\n Select another gem \nof the same type");
-         optionText.setText("");
+            instructions.setText("\n  Select two more \nunique gems \n\n or \n\n Select another gem \nof the same type");
+            optionText.setText("");
         }
-        
+
+        //taking the gem will have been a sucess by this point
+        //so play the sound effect
+        if(soundEffectsAllowed){
+                                try{
+                                    audio.playEffect(selectGem);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                            
         /*these statements check the various conditions the market could be in and ends the turn accordingly
-        *the turn will end if:
-        * A player has two gems and there are only two types of gems available in the market
-        * A player has one gem and there is only one type of gem available in the market
-        * There are no gems left in the market
-        * The first two gems taken were of the same type
-        * The player's inventory becomes full
-        * Or the player takes a 3rd gem
-        **/
+         *the turn will end if:
+         * A player has two gems and there are only two types of gems available in the market
+         * A player has one gem and there is only one type of gem available in the market
+         * There are no gems left in the market
+         * The first two gems taken were of the same type
+         * The player's inventory becomes full
+         * Or the player takes a 3rd gem
+         **/
         if(gem2Type != null && difGemTypesAvailable == 2){
             gem1Type = null;
             gem2Type = null;
-            gem3Type = null;
-        return 2;
+            gem3Type = null;           
+            return 2;
         }
         else if(gem1Type != null && difGemTypesAvailable == 1){
             gem1Type = null;
             gem2Type = null;
             gem3Type = null;
-        return 2;
+            return 2;
         }
         else if(marketDiamond + marketSapphire + marketEmerald + marketRuby + marketOnyx == 0){
             gem1Type = null;
             gem2Type = null;
             gem3Type = null;
-        return 2;
+            return 2;
         }
-       else if(gem1Type == gem2Type){
+        else if(gem1Type == gem2Type){
             gem1Type = null;
             gem2Type = null;
             gem3Type = null;
-        return 2;
+            return 2;
         }
-       else if(players[activePlayer].getTotalGems() == 10){
+        else if(players[activePlayer].getTotalGems() == 10){
             gem1Type = null;
             gem2Type = null;
             gem3Type = null;
-        return 2;
-    }
-    else if(gem3Type != null){
-        gem1Type = null;
+            return 2;
+        }
+        else if(gem3Type != null){
+            gem1Type = null;
             gem2Type = null;
             gem3Type = null;
-        return 2;
-    }
+            return 2;
+        }
         else
-        return 1; // success, and you can pick more gems
+            return 1; // success, and you can pick more gems
     }
-    
+
     /**
      * Changes the scene and declares the winner
      * 
      * @param name - the name of the winner
      */
-    public static void winner(String name){                
+    public static void winner(String name){
+        try{
+        audio.victoryFanfare();
+    }
+    catch(Exception e){
+     e.printStackTrace();   
+    }
         Glow glow = new Glow();
         glow.setLevel(5);
-        
+
         if(winnerRoot.getChildren().contains(victorText))
-        winnerRoot.getChildren().remove(victorText);
-        
+            winnerRoot.getChildren().remove(victorText);
+
         if(!name.equals("Tie")){
-        victorText.setText(name + " Wins!");
-    }
-    else{
-        victorText.setText(name);
-    }
+            victorText.setText(name + " Wins!");
+        }
+        else{
+            victorText.setText(name);
+        }
         victorText.setFont(Font.font("Verdana", 52));
         victorText.setFill(Color.WHITE);
         victorText.setTextAlignment(TextAlignment.CENTER);
         victorText.setTranslateX(450);
         victorText.setTranslateY(420);
         victorText.setEffect(glow);
-        
+
         winnerRoot.getChildren().addAll(victorText);
         mainStage.setScene(winnerScene);
     }
-    
+
     /**
      * Reinitializes game-specific components to reset the program for
      * a new game.
@@ -1450,21 +1694,21 @@ public class Main extends Application
     private void newGame(String player1FieldContent, String player2FieldContent, String player3FieldContent, String player4FieldContent) throws IOException{
         players = new Player[numberOfPlayers];
         activePlayer = 0;
-        
+
         String player1Name = player1FieldContent;
         String player2Name = player2FieldContent;
         String player3Name = player3FieldContent;
         String player4Name = player4FieldContent;
-        
+
         if(isSinglePlayer){
-        //sets the default names for AI players
+            //sets the default names for AI players
             player2Name = "Wallace";
             player3Name = "Bruce";
             player4Name = "Connor";        
-    }
-        
+        }
+
         loadingWarning.setText(""); //resets the loading text
-        
+
         //places the appropriate number of gems in the market
         if(numberOfPlayers == 4){
             marketDiamond = 7;
@@ -1487,7 +1731,7 @@ public class Main extends Application
             marketRuby = 4;
             marketOnyx = 4;
         }
-        
+
         //creates the players
         players[0] = new Player(0, player1Name, false);
         players[0].setActivePlayer();
@@ -1496,20 +1740,19 @@ public class Main extends Application
             players[2] = new Player(2, player3Name, isSinglePlayer); // will be AI if in single player
         }
         if (numberOfPlayers == 4){
-         players[3] = new Player(3, player4Name, isSinglePlayer); // will be AI if in single player   
+            players[3] = new Player(3, player4Name, isSinglePlayer); // will be AI if in single player   
         }
-        
+
         //removes any existing play visuals from the scene
         if(root.getChildren().contains(player1Group))
-        root.getChildren().remove(player1Group);
+            root.getChildren().remove(player1Group);
         if(root.getChildren().contains(player2Group))
-        root.getChildren().remove(player3Group);
+            root.getChildren().remove(player3Group);
         if(root.getChildren().contains(player3Group))
-        root.getChildren().remove(player3Group);
+            root.getChildren().remove(player3Group);
         if(root.getChildren().contains(player4Group))
-        root.getChildren().remove(player4Group);
-        
-        
+            root.getChildren().remove(player4Group);
+
         //adds player visuals to the scene
         player1Group = players[0].getVisuals();
         player1Group.setTranslateY(550);
@@ -1527,26 +1770,32 @@ public class Main extends Application
             player4Group.setTranslateX(1084);
             root.getChildren().add(player4Group);
         }  
-        
+
+        //enable the cheat
+        for(Player player : players){
+            if(player.getName().equals("Hodgson"))
+                player.enableCheat();
+        }
+
         //clears the decks
         if(!level1Deck.isEmpty())
-        level1Deck.clear();
+            level1Deck.clear();
         if(!level2Deck.isEmpty())
-        level2Deck.clear();
+            level2Deck.clear();
         if(!level3Deck.isEmpty())
-        level3Deck.clear();
-        
+            level3Deck.clear();
+
         //regenerates the decks
         level1Deck = deckGenerator.generateLevel1Deck();
         level2Deck = deckGenerator.generateLevel2Deck();
         level3Deck = deckGenerator.generateLevel3Deck();
         nobleDeck = deckGenerator.generateNoblesDeck();
-        
+
         //clears the market displays
         level1Available.getChildren().clear();
         level2Available.getChildren().clear();
         level3Available.getChildren().clear();
-        
+
         //repopulates the market displays
         for(int i = 0; i < level1Market.length; i++){
             Card card = level1Deck.pop();
@@ -1555,7 +1804,7 @@ public class Main extends Application
             level1Market[i] = card;
             level1Available.getChildren().add(cardVisuals);
         }
-        
+
         for(int i = 0; i < level2Market.length; i++){
             Card card = level2Deck.pop();
             Group cardVisuals = card.getVisuals();
@@ -1563,7 +1812,7 @@ public class Main extends Application
             level2Market[i] = card;
             level2Available.getChildren().add(cardVisuals);
         }
-        
+
         for(int i = 0; i < level3Market.length; i++){
             final int index = i;
             Card card = level3Deck.pop();
@@ -1572,10 +1821,10 @@ public class Main extends Application
             level3Market[i] = card;
             level3Available.getChildren().add(cardVisuals);
         }
-        
+
         //sets the correct number of noble spaces in the market
         noblesMarket = new Noble[numberOfPlayers];
-        
+
         availableNobles = new VBox();
         availableNobles.setTranslateX(820);
         availableNobles.setTranslateY(110);
@@ -1589,27 +1838,40 @@ public class Main extends Application
             nobleVisuals.setOnMousePressed( new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent event){
                         if(gem1Type == null){ //ensures play has not started selecting gems
-                        int success = purchaseNoble(noble);
-                        if (success == 1){//if the noble can be purchased
-                            availableNobles.getChildren().get(index).setVisible(false); //set the noble to be invisible
-                            players[activePlayer].addNoble(noble); //add the noble to the player
-                            nextTurn();
-                        }
-                        else {
-                            instructions.setText("\n\n Not enough bonuses");
-                            optionText.setText("");
+                            int success = purchaseNoble(noble);
+                            if (success == 1){//if the noble can be purchased
+                                availableNobles.getChildren().get(index).setVisible(false); //set the noble to be invisible
+                                players[activePlayer].addNoble(noble); //add the noble to the player
+
+                                if(soundEffectsAllowed){
+                                    try{
+                                        audio.playEffect(cardDraw);
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                nextTurn();
+                            }
+                            else {
+                                if(players[activePlayer].getHasNoble())
+                                    instructions.setText("\n\n Already have a \n   noble");
+                                else
+                                    instructions.setText("\n\n Not enough bonuses");
+                                optionText.setText("");
+                            }
                         }
                     }
-                }
                 });
             noblesMarket[i] = noble;
             availableNobles.getChildren().add(nobleVisuals);
         }
-        
+
         turnMarker.setText(players[activePlayer].getName() + "'s");
-        
+
         //creates the Help and Exit buttons
-        
+
         Button help = new Button("HELP");
         help.setTextAlignment(TextAlignment.CENTER);
         help.setFocusTraversable(false);
@@ -1618,19 +1880,27 @@ public class Main extends Application
         help.setTranslateX(25);
         help.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     //Opens the instruction manual pdf through your Desktop's
                     //default program for opening a pdf
                     if (Desktop.isDesktopSupported()) {
-                    try {
-                    Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
-                    } catch (Exception e) {
-                    e.printStackTrace();
-                    }
+                        try {
+                            Desktop.getDesktop().open(new File("./Resources/Instructions.pdf"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } 
 
                 }
             }); 
-            
 
         Button exit = new Button("EXIT");
         exit.setTextAlignment(TextAlignment.CENTER);
@@ -1640,20 +1910,53 @@ public class Main extends Application
         exit.setTranslateX(27);
         exit.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     mainStage.setScene(mainMenu);
                 }
             }); 
+
+        Button inGameSoundMenu = new Button("SOUND");
+        inGameSoundMenu.setTextAlignment(TextAlignment.CENTER);
+        inGameSoundMenu.setFocusTraversable(false);
+        inGameSoundMenu.setScaleX(1.75);
+        inGameSoundMenu.setScaleY(1.75);
+        inGameSoundMenu.setTranslateX(1113);
+        inGameSoundMenu.setTranslateY(595);
+        inGameSoundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event){
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    openSoundControls();
+                }
+            });
 
         VBox macroButtons = new VBox(help, exit);
         macroButtons.setSpacing(22);
         macroButtons.setTranslateX(13);
         macroButtons.setTranslateY(565);
-        root.getChildren().addAll(macroButtons, availableNobles);
-        
+        root.getChildren().addAll(macroButtons, availableNobles, inGameSoundMenu);
+
+        resetInstructions();
+
         //sets the scene
         mainStage.setScene(mainScene);
     }
-    
+
     /**
      * Sets player names from the appropriate text fields
      * 
@@ -1665,93 +1968,305 @@ public class Main extends Application
         enterNamesLogo.setScaleY(0.5);
         enterNamesLogo.setTranslateX(-550);
         enterNamesLogo.setTranslateY(-250);
-              
+
         VBox playerNameTextField = new VBox();
         playerNameTextField.setSpacing(10);
         playerNameTextField.setTranslateX(540);
         playerNameTextField.setTranslateY(350);        
-        
+
         if(!isSinglePlayer){
-        //displays as many text fields as there are local players
-        for (int i = 0; i < localPlayers; i++){            
-            Label playerLabel = new Label("Player " + (i+1) + " Name");
-            VBox playerNameFields = new VBox(playerLabel);
-            
-            switch(i){
-             case 0:
-             player1NameField.clear();
-             playerNameFields.getChildren().add(player1NameField);
-             break;
-             case 1:
-             player2NameField.clear();
-             playerNameFields.getChildren().add(player2NameField);
-             break;
-             case 2:
-             player3NameField.clear();
-             playerNameFields.getChildren().add(player3NameField);
-             break;
-             case 3:
-             player4NameField.clear();
-             playerNameFields.getChildren().add(player4NameField);
-             break;
-             
+            //displays as many text fields as there are local players
+            for (int i = 0; i < localPlayers; i++){            
+                Label playerLabel = new Label("Player " + (i+1) + " Name");
+                VBox playerNameFields = new VBox(playerLabel);
+
+                switch(i){
+                    case 0:
+                    player1NameField.clear();
+                    playerNameFields.getChildren().add(player1NameField);
+                    break;
+                    case 1:
+                    player2NameField.clear();
+                    playerNameFields.getChildren().add(player2NameField);
+                    break;
+                    case 2:
+                    player3NameField.clear();
+                    playerNameFields.getChildren().add(player3NameField);
+                    break;
+                    case 3:
+                    player4NameField.clear();
+                    playerNameFields.getChildren().add(player4NameField);
+                    break;
+
+                }
+
+                playerNameTextField.getChildren().add(playerNameFields);
             }
-            
+        }
+        else{
+            Label playerLabel = new Label("Player Name");
+            VBox playerNameFields = new VBox(playerLabel);
+            player1NameField.clear();
+            playerNameFields.getChildren().add(player1NameField);
             playerNameTextField.getChildren().add(playerNameFields);
         }
-    }
-    else{
-        Label playerLabel = new Label("Player Name");
-        VBox playerNameFields = new VBox(playerLabel);
-        player1NameField.clear();
-        playerNameFields.getChildren().add(player1NameField);
-        playerNameTextField.getChildren().add(playerNameFields);
-    }
-        
+
         //sets the scene
         Group enterNamesRoot = new Group(namesDone, enterNamesLogo, playerNameTextField, loadingWarning);
         Scene enterNamesScene = new Scene(enterNamesRoot, 1200, 650);
         enterNamesScene.setFill(Color.GREEN);
         mainStage.setScene(enterNamesScene);
     }
-    
+
     private static void resetInstructions(){
-     instructions.setText("Choose from one of\n the following actions:");
-     optionText.setText("1. Take 3 gems of\n different types\n\n" +
-                                   "2. Take 2 gems of the\n same type\n" +
-                                   " (Must be 4 tokens of\n that type)\n\n" +
-                                   "3. Reserve a card and\n take a Gold\n\n" +
-                                   "4. Purchase a card");
+        instructions.setText("Choose from one of\n the following actions:");
+        optionText.setText("1. Take 3 gems of\n different types\n\n" +
+            "2. Take 2 gems of the\n same type\n" +
+            " (Must be 4 tokens of\n that type)\n\n" +
+            "3. Reserve a card and\n take a Gold\n\n" +
+            "4. Purchase a card");
     }
-    
+
+    private void openSoundControls(){
+
+        Label musicLabel = new Label("Background Music:");
+        musicLabel.setFont(new Font(16));
+        musicLabel.setTranslateX(-48);
+
+        Button backgroundMusic = new Button("ON");
+        if(backgroundMusicIsPlaying)
+            backgroundMusic.setText("OFF");
+        backgroundMusic.setTextAlignment(TextAlignment.CENTER);
+        backgroundMusic.setFocusTraversable(false);
+        backgroundMusic.setScaleX(2.5);
+        backgroundMusic.setScaleY(1.75);        
+        backgroundMusic.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    try{
+                        if(!backgroundMusicIsPlaying){
+                            backgroundMusicIsPlaying = true;
+                            backgroundMusic.setText("OFF");
+                            audio.play(berwickCourt);
+                        }
+                        else{
+                            backgroundMusicIsPlaying = false;
+                            backgroundMusic.setText("ON");
+                            audio.stop();
+                        }
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();   
+                    }
+                }
+            }); 
+
+        Slider musicVol = new Slider(-24, 6, audio.getMusicGain());
+        musicVol.setShowTickMarks(true);
+        musicVol.setMajorTickUnit(6);
+        musicVol.setMinorTickCount(2);
+        musicVol.setBlockIncrement(10);
+        musicVol.setTranslateX(-52);
+
+        musicVol.valueProperty().addListener(new InvalidationListener(){
+                @Override
+                public void invalidated(Observable observable){
+                    audio.setMusicVol((int)Math.floor(musicVol.getValue()));
+                }
+
+            });
+            
+        VBox musicToggle = new VBox(musicLabel, backgroundMusic, musicVol);
+        musicToggle.setSpacing(17);
+        musicToggle.setTranslateX(80);
+        musicToggle.setTranslateY(20);
+            
+        Label effectsLabel = new Label("Sound Effects:");
+        effectsLabel.setFont(new Font(16));
+        effectsLabel.setTranslateX(-32);
+
+        Button soundEffects = new Button("OFF");
+        if(!soundEffectsAllowed)
+            soundEffects.setText("ON");
+        soundEffects.setTextAlignment(TextAlignment.CENTER);
+        soundEffects.setFocusTraversable(false);
+        soundEffects.setScaleX(2.5);
+        soundEffects.setScaleY(1.75);        
+        soundEffects.setOnMouseClicked( new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent event) {
+                    if(soundEffectsAllowed){
+                        try{
+                            audio.playEffect(buttonClick);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    try{
+                        if(!soundEffectsAllowed){
+                            soundEffectsAllowed = true;
+                            soundEffects.setText("OFF");
+                        }
+                        else{
+                            soundEffectsAllowed = false;
+                            soundEffects.setText("ON");
+                        }
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();   
+                    }
+                }
+            }); 
+
+        Slider fxVol = new Slider(-24, 6, audio.getFXGain());
+        fxVol.setShowTickMarks(true);
+        fxVol.setMajorTickUnit(6);
+        fxVol.setMinorTickCount(2);
+        fxVol.setBlockIncrement(10);
+        fxVol.setTranslateX(-52);
+
+        fxVol.valueProperty().addListener(new InvalidationListener(){
+                @Override
+                public void invalidated(Observable observable){
+                    audio.setFXVol((int)Math.floor(fxVol.getValue()));
+                }
+
+            });
+            
+        VBox effectsToggle = new VBox(effectsLabel, soundEffects, fxVol);
+        effectsToggle.setSpacing(17);
+        effectsToggle.setTranslateX(80);
+        effectsToggle.setTranslateY(130);
+
+        Group soundRoot = new Group(musicToggle, effectsToggle);
+        Scene soundScene = new Scene(soundRoot, 200, 250);
+        soundScene.setFill(Color.GREEN);
+
+        Stage soundStage = new Stage();
+        soundStage.setTitle("Sound Settings");
+        soundStage.setScene(soundScene);
+        soundStage.show();
+
+    }
+
     public static void doAITurn(int personality){
         switch(personality){
-         case 1:
-         aiProtocol1();
-         break;
-         case 2:
-         aiProtocol1();
-         //aiProtocol2();
-         break;
-         case 3:
-         aiProtocol1();
-         //aiProtocol3();
-         break;
+            case 1:
+            aiProtocol1();
+            break;
+            case 2:
+            aiProtocol1();
+            //aiProtocol2();
+            break;
+            case 3:
+            aiProtocol1();
+            //aiProtocol3();
+            break;
         }
     }
-    
+
     public static void aiProtocol1(){
         System.out.println("Doing behaviour set 1");
-        Main.nextTurn();        
+        Player player = players[activePlayer];
+
+        if(!player.isHandFull()){
+            int level = random.nextInt(3) + 1;
+            int index = random.nextInt(5);
+
+            switch(level){
+                case 1:
+                player.addCardToHand(level1Market[index]);
+                aiReserveCard(level1Deck, level1Available, index, level1Market);
+                break;
+                case 2:
+                player.addCardToHand(level2Market[index]);
+                aiReserveCard(level2Deck, level2Available, index, level2Market);
+                break;
+                case 3:
+                player.addCardToHand(level3Market[index]);
+                aiReserveCard(level3Deck, level3Available, index, level3Market);
+                break;
+            }
+        }
+        /*
+        if(player.getTotalGems() < 10){
+        int success = 0;
+        while(success != 2){
+        success = takeRandomGem();
+        System.out.println(success);
+        }
+        }
+         */
+
+        nextTurn();        
     }
-    
+
     public static void aiProtocol2(){
         System.out.println("Doing behaviour set 2");
-        Main.nextTurn();  
+        nextTurn();  
     }
-    
+
     public static void aiProtocol3(){
         System.out.println("Doing behaviour set 3");
-        Main.nextTurn();  
+        nextTurn();  
+    }
+
+    private static int takeRandomGem(){
+        int gemToBeTaken = random.nextInt(5)+1;
+        switch(gemToBeTaken){
+            case 1:
+            return takeGem(GemType.DIAMOND);
+            case 2:
+            return takeGem(GemType.SAPPHIRE);
+            case 3:
+            return takeGem(GemType.EMERALD);
+            case 4:
+            return takeGem(GemType.RUBY);
+            case 5:
+            return takeGem(GemType.ONYX);
+        }
+        return 0;
+    }
+
+    private static void aiReserveCard(Stack<Card> deck, HBox marketDisplay, int index, Card[] marketView){
+        if(!deck.isEmpty()) //if the deck is not empty
+            marketDisplay.getChildren().remove(index); //remove the card
+        else // the deck is empty therefore make the deck back
+            marketDisplay.getChildren().get(index).setVisible(false);
+
+        //add a gold token to the players inventory if there is
+        //space and a gold token is available to be taken from
+        //the market
+        if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
+            marketGold--;
+            updateGemVisuals();
+            players[activePlayer].addGem(GemType.GOLD);                        
+        }
+        else if(marketGold > 1 && players[activePlayer].getTotalGems() < 10){
+            marketGold--;
+            players[activePlayer].addGem(GemType.GOLD);
+        }
+
+        //a new card is drawn to replace it
+        Card newCard = deck.pop();
+        Group newCardVisuals = newCard.getVisuals();
+
+        //***************
+        //!!!RECURSION!!!
+        //***************
+        //Recursively adds functionality to the replacement card
+        addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+        marketView[index] = newCard;
+        marketDisplay.getChildren().add(index, newCardVisuals);
+
     }
 }
