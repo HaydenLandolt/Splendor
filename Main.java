@@ -1,3 +1,4 @@
+
 import com.interactivemesh.jfx.importer.ImportException;
 
 import java.awt.Desktop;
@@ -54,7 +55,9 @@ public class Main extends Application
 {
     DeckGenerator deckGenerator = new DeckGenerator();
     static AudioPlayer audio = new AudioPlayer();
-
+    static Player[] players; 
+    static Random random = new Random();
+    
     //Sound files
     static File berwickCourt = new File("./Resources/Sounds/BerwickCourt.wav");
     static File buttonClick = new File("./Resources/Sounds/buttonClick.wav");
@@ -62,85 +65,93 @@ public class Main extends Application
     static File selectGem = new File("./Resources/Sounds/selectGem.wav");
     static File scorePoint = new File("./Resources/Sounds/scorePoint.wav");
 
+    //Booleans controlling sound permissions
     static boolean backgroundMusicIsPlaying = true;
     static boolean soundEffectsAllowed = true;
 
+    //Controlling game mode
     boolean isSinglePlayer = false;
-
     static int numberOfPlayers;
     static int activePlayer;
 
+    //Market gem quantities
     static int marketDiamond;
     static int marketSapphire;
     static int marketEmerald;
     static int marketRuby;
     static int marketOnyx;
-    static int marketGold = 5;
+    static int marketGold = 5; //there will always be 5 gold in the market, regardless of the number of players
 
+    //Player names
     String player1Name = null;
     String player2Name = null;
     String player3Name = null;
     String player4Name = null;
 
+    //Text fields for entering player names
     TextField player1NameField = new TextField();
     TextField player2NameField = new TextField();
     TextField player3NameField = new TextField();
     TextField player4NameField = new TextField();
+    
+    //Other name screen elements
+    Button namesDone;
+    Text loadingWarning = new Text();
 
+    //JavaFX objects for the main scene
     static Stage mainStage;
     static Scene mainScene;
     static Group root;
+    static Button mainMenuButton;
+    Scene mainMenu;
 
+    //Graphics for the deck backs
     static ImageView level1DeckBack;
     static ImageView level2DeckBack;
     static ImageView level3DeckBack;
 
+    //Objects for the winner scene
     static Group winnerRoot;
     static Scene winnerScene;
     static Text victorText = new Text();
 
+    //Gem market area
     GemModels gemModels = new GemModels();
     static GridPane marketGemDisplay;
-
-    static Button mainMenuButton;
-
-    Scene mainMenu;
-
-    static Noble[] noblesMarket;
+    
+    //Market object decks
     static Stack<Noble> nobleDeck;
     static Stack<Card> level1Deck = new Stack<Card>();
     static Stack<Card> level2Deck = new Stack<Card>();
     static Stack<Card> level3Deck = new Stack<Card>();
 
+    //Market arrays
+    static Noble[] noblesMarket;
     static Card[] level1Market;
     static Card[] level2Market;
     static Card[] level3Market;
 
+    //Market displays
     static VBox availableNobles;
-
     static HBox level1Available;
     static HBox level2Available;
     static HBox level3Available;
 
+    //GemTypes for tracking current gem selections
     static GemType gem1Type;
     static GemType gem2Type;
     static GemType gem3Type;
 
+    //Player visuals
     static Group player1Group;
     static Group player2Group;
     static Group player3Group;
     static Group player4Group;
 
-    Button namesDone;
-    Text loadingWarning = new Text();
-
+    //In-game instructions text
     static Text turnMarker;
     static Text instructions;
     static Text optionText;
-
-    static Player[] players; 
-
-    static Random random = new Random();
 
     /**
      * Initializes and shows the main stage
@@ -272,9 +283,6 @@ public class Main extends Application
                                     nextTurn();
                                 }
                             }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
                         }
                     });
                 break;
@@ -293,9 +301,6 @@ public class Main extends Application
                                 if (success == 2){
                                     nextTurn();
                                 }
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
                             }
                         }
                     });
@@ -316,9 +321,6 @@ public class Main extends Application
                                     nextTurn();
                                 }
                             }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
                         }
                     });
                 break;
@@ -337,9 +339,6 @@ public class Main extends Application
                                 if (success == 2){
                                     nextTurn();
                                 }
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
                             }
                         }
                     });
@@ -360,16 +359,14 @@ public class Main extends Application
                                     nextTurn();
                                 }
                             }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
                         }
                     });
                 break;
                 case 5:
                 gemModelGroup.setOnMousePressed( new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent event){
-                            System.out.println("Must reserve a card first");
+                            instructions.setText("\n\n  Must reserve a card \nfirst");
+                            optionText.setText("");
                         }
                     });
                 break;
@@ -397,7 +394,8 @@ public class Main extends Application
                         int success = players[activePlayer].addCardToHand(level1Deck.peek());
                         if (success == 1){
                             level1Deck.pop();
-
+                            
+                            //plays the appropriate sound effect
                             if(soundEffectsAllowed){
                                 try{
                                     audio.playEffect(cardDraw);
@@ -406,7 +404,8 @@ public class Main extends Application
                                     e.printStackTrace();
                                 }
                             }
-
+                            
+                            //takes a gold if possible
                             if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
@@ -416,12 +415,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            else if(players[activePlayer].getTotalGems() == 10){
-                                System.out.println("Inventory full");
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
+                            
                             //advance to next player
                             nextTurn();
                         }
@@ -440,6 +434,7 @@ public class Main extends Application
                         if (success == 1){
                             level2Deck.pop();
 
+                            //plays the appropriate sound effect
                             if(soundEffectsAllowed){
                                 try{
                                     audio.playEffect(cardDraw);
@@ -449,6 +444,7 @@ public class Main extends Application
                                 }
                             }
 
+                            //takes gold if possible
                             if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
@@ -458,12 +454,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            else if(players[activePlayer].getTotalGems() == 10){
-                                System.out.println("Inventory full");   
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
+                            
                             //advance to next player
                             nextTurn();
                         }
@@ -482,6 +473,7 @@ public class Main extends Application
                         if (success == 1){
                             level3Deck.pop();
 
+                            //plays the appropriate sound effect
                             if(soundEffectsAllowed){
                                 try{
                                     audio.playEffect(cardDraw);
@@ -491,6 +483,7 @@ public class Main extends Application
                                 }
                             }
 
+                            //takes gold if possible
                             if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
                                 updateGemVisuals();
@@ -500,12 +493,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            else if (players[activePlayer].getTotalGems() == 10){
-                                System.out.println("Inventory full");
-                            }
-                            else {
-                                System.out.println("No more gems of that type");
-                            }
+                            
                             //advance to next player
                             nextTurn();
                         }
@@ -557,6 +545,7 @@ public class Main extends Application
         singlePlayer.setTextAlignment(TextAlignment.CENTER);
         singlePlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -581,6 +570,7 @@ public class Main extends Application
         multiplayer.setTextAlignment(TextAlignment.CENTER);
         multiplayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -609,6 +599,7 @@ public class Main extends Application
         mainMenuHelp.setTranslateX(25);
         mainMenuHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -639,6 +630,7 @@ public class Main extends Application
         mainMenuExit.setTranslateX(27);
         mainMenuExit.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -648,7 +640,7 @@ public class Main extends Application
                         }
                     }
 
-                    System.exit(0);
+                    System.exit(0); //exits the program
                 }
             }); 
 
@@ -661,6 +653,7 @@ public class Main extends Application
         soundMenu.setTranslateY(-50);
         soundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -670,7 +663,7 @@ public class Main extends Application
                         }
                     }
 
-                    openSoundControls();
+                    openSoundControls(); //opens the sound control window
                 }
             }); 
 
@@ -698,6 +691,7 @@ public class Main extends Application
         mainMenuButton.setTranslateY(500);
         mainMenuButton.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -731,6 +725,7 @@ public class Main extends Application
         playerSelectionHelp.setTranslateX(25);
         playerSelectionHelp.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -761,6 +756,7 @@ public class Main extends Application
         playerSelectionBack.setTranslateX(24);
         playerSelectionBack.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -784,6 +780,7 @@ public class Main extends Application
         playerSelectSoundMenu.setTranslateY(-50);
         playerSelectSoundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -813,6 +810,7 @@ public class Main extends Application
         twoPlayer.setTextAlignment(TextAlignment.CENTER);
         twoPlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -842,6 +840,7 @@ public class Main extends Application
         threePlayer.setTextAlignment(TextAlignment.CENTER);
         threePlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -871,6 +870,7 @@ public class Main extends Application
         fourPlayer.setTextAlignment(TextAlignment.CENTER);
         fourPlayer.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -905,9 +905,11 @@ public class Main extends Application
         namesDone.setScaleY(1.75);
         namesDone.setTranslateX(590);
         namesDone.setTranslateY(600);
+        
         //creates the loading warning
         namesDone.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -924,6 +926,7 @@ public class Main extends Application
                     loadingWarning.setTranslateY(578);
                 }
             }); 
+            
         // takes the names and starts a new game
         namesDone.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
@@ -939,12 +942,12 @@ public class Main extends Application
 
         //starts the backgroundMusic
         try{
-        audio.play(berwickCourt);
-    }
-    catch (Exception e){
-        e.printStackTrace();
-    }
-        
+            audio.play(berwickCourt);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
         //starts the window
         stage.setTitle("Splendor");
         stage.setResizable(false);
@@ -1073,8 +1076,8 @@ public class Main extends Application
     }
 
     /**
-     * Updates the visuals to reflect the new victory points and
-     * bonuses of the player.
+     * Updates the visuals to reflect the new number of
+     * gems in the market
      */
     private static void updateGemVisuals(){
         marketGemDisplay.getChildren().get(0).setVisible(marketDiamond > 0);
@@ -1122,6 +1125,7 @@ public class Main extends Application
                                 players[activePlayer].addCard(card); // card is added to the player
                                 players[activePlayer].spendGems(returnGems(card)); //gems are spent
 
+                                //plays the appropriate sound effect
                                 if(soundEffectsAllowed){
                                     try{
                                         audio.playEffect(cardDraw);
@@ -1171,13 +1175,8 @@ public class Main extends Application
                                     marketGold--;
                                     players[activePlayer].addGem(GemType.GOLD);
                                 }
-                                else if (players[activePlayer].getTotalGems() == 10){
-                                    System.out.println("Inventory Full");
-                                }
-                                else {
-                                    System.out.println("No more gems of that type");
-                                }
 
+                                //plays the appropriate sound effect
                                 if(soundEffectsAllowed){
                                     try{
                                         audio.playEffect(cardDraw);
@@ -1386,6 +1385,7 @@ public class Main extends Application
                             players[activePlayer].spendGems(returnGems(card)); // spends gems
                             players[activePlayer].removeCardFromHand(index); // removes the cards from the hand
 
+                            //plays the appropriate sound effect
                             if(soundEffectsAllowed){
                                 try{
                                     audio.playEffect(cardDraw);
@@ -1411,24 +1411,35 @@ public class Main extends Application
      * Starts the next turn
      */
     public static void nextTurn(){
+        //deactivates the current player
         players[activePlayer].setUnactivePlayer();
 
         //Updates the active player
         activePlayer++;
+        
         //Checks if there is a winner
+        String winnerName = null;
         if(activePlayer == numberOfPlayers){
-            String winnerName = checkIfWinner();     
+            winnerName = checkIfWinner();     
             if(winnerName == null)
                 activePlayer = 0;
-            else
+            else{
                 winner(winnerName);
-                
+            }
         }
-        players[activePlayer].setActivePlayer();
+        //the below statement allows the method to finish running without throwing
+        //an error as would happen when a player won and the active player was not
+        //reset to 0
+        if(winnerName == null){ 
+            players[activePlayer].setActivePlayer();
 
-        //updates the text in the tooltip display
-        turnMarker.setText(players[activePlayer].getName()  + "'s");
-        resetInstructions();
+            //updates the text in the tooltip display
+            if(activePlayer == numberOfPlayers)
+                activePlayer = 0;
+            turnMarker.setText(players[activePlayer].getName()  + "'s");
+            resetInstructions();
+        }
+
     }
 
     /**
@@ -1439,7 +1450,7 @@ public class Main extends Application
     private static String checkIfWinner(){
         ArrayList<Player> victoriousPlayers = new ArrayList<Player>();
 
-        //checks to see which players are victorious
+        //checks to see which players are victorious (there may be more than one)
         for(int i = 0; i < players.length; i++){
             if(players[i].getVP() >= 15)
                 victoriousPlayers.add(players[i]);
@@ -1451,6 +1462,8 @@ public class Main extends Application
             return victoriousPlayers.get(0).getName(); // one winner
         else{
             //breaks the tie if there are multiple potential winners
+            //Winner is either the person with the least development cards or,
+            // if they both have the same amount, then it is a tie.
             Player lowestDevCards = null;
             Player tiedDevCards = null;
             for (int i = 0; i < victoriousPlayers.size(); i++){
@@ -1501,7 +1514,7 @@ public class Main extends Application
             gem1Type = gem;
         else if(gem2Type == null){
             if(gem == gem1Type && gem1Type != null){ //if the player is trying to take two gems of the same type
-                //make sure there were initially 4 gems of that type in the market
+                //makes sure there were initially 4 gems of that type in the market
                 switch(gem){
                     case DIAMOND:
                     if(marketDiamond < 3){
@@ -1544,7 +1557,7 @@ public class Main extends Application
                 gem2Type = gem;
         }
         else{
-            if (gem1Type == gem || gem2Type == gem){ //makes sure the player isn't trying to double up on a type of gem
+            if (gem1Type == gem || gem2Type == gem){ //makes sure the player isn't trying to double up on one type of gem
                 return 0;   
             }
             else{
@@ -1552,6 +1565,7 @@ public class Main extends Application
             }
         }
 
+        //removes the gem from the market inventory
         switch(gem){
             case DIAMOND:
             marketDiamond--;
@@ -1589,17 +1603,17 @@ public class Main extends Application
 
         //taking the gem will have been a sucess by this point
         //so play the sound effect
-        if(soundEffectsAllowed){
-                                try{
-                                    audio.playEffect(selectGem);
-                                }
-                                catch(Exception e){
-                                    e.printStackTrace();
-                                }
-                            }
-                            
+        if(soundEffectsAllowed && !players[activePlayer].getIsAI()){
+            try{
+                audio.playEffect(selectGem);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
         /*these statements check the various conditions the market could be in and ends the turn accordingly
-         *the turn will end if:
+         *The turn will end if:
          * A player has two gems and there are only two types of gems available in the market
          * A player has one gem and there is only one type of gem available in the market
          * There are no gems left in the market
@@ -1653,12 +1667,14 @@ public class Main extends Application
      * @param name - the name of the winner
      */
     public static void winner(String name){
+        //plays the victory fanfare
         try{
-        audio.victoryFanfare();
-    }
-    catch(Exception e){
-     e.printStackTrace();   
-    }
+            audio.victoryFanfare();
+        }
+        catch(Exception e){
+            e.printStackTrace();   
+        }
+        
         Glow glow = new Glow();
         glow.setLevel(5);
 
@@ -1695,6 +1711,7 @@ public class Main extends Application
         players = new Player[numberOfPlayers];
         activePlayer = 0;
 
+        //Takes player names from the corrisponding text fields
         String player1Name = player1FieldContent;
         String player2Name = player2FieldContent;
         String player3Name = player3FieldContent;
@@ -1743,7 +1760,7 @@ public class Main extends Application
             players[3] = new Player(3, player4Name, isSinglePlayer); // will be AI if in single player   
         }
 
-        //removes any existing play visuals from the scene
+        //removes any existing player visuals from the scene
         if(root.getChildren().contains(player1Group))
             root.getChildren().remove(player1Group);
         if(root.getChildren().contains(player2Group))
@@ -1771,7 +1788,7 @@ public class Main extends Application
             root.getChildren().add(player4Group);
         }  
 
-        //enable the cheat
+        //enables the cheat
         for(Player player : players){
             if(player.getName().equals("Hodgson"))
                 player.enableCheat();
@@ -1843,6 +1860,7 @@ public class Main extends Application
                                 availableNobles.getChildren().get(index).setVisible(false); //set the noble to be invisible
                                 players[activePlayer].addNoble(noble); //add the noble to the player
 
+                                //plays the appropriate sound effect
                                 if(soundEffectsAllowed){
                                     try{
                                         audio.playEffect(cardDraw);
@@ -1880,6 +1898,7 @@ public class Main extends Application
         help.setTranslateX(25);
         help.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -1910,6 +1929,7 @@ public class Main extends Application
         exit.setTranslateX(27);
         exit.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -1932,6 +1952,7 @@ public class Main extends Application
         inGameSoundMenu.setTranslateY(595);
         inGameSoundMenu.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -2004,6 +2025,7 @@ public class Main extends Application
             }
         }
         else{
+            //displays one text field for the single player
             Label playerLabel = new Label("Player Name");
             VBox playerNameFields = new VBox(playerLabel);
             player1NameField.clear();
@@ -2018,6 +2040,9 @@ public class Main extends Application
         mainStage.setScene(enterNamesScene);
     }
 
+    /**
+     * Resets the tooltip display instructions to the default turn options
+     */
     private static void resetInstructions(){
         instructions.setText("Choose from one of\n the following actions:");
         optionText.setText("1. Take 3 gems of\n different types\n\n" +
@@ -2027,6 +2052,10 @@ public class Main extends Application
             "4. Purchase a card");
     }
 
+    /**
+     * Opens the sound controls window allowing the player to enable and disable
+     * sounds as well as adjust their volumes.
+     */
     private void openSoundControls(){
 
         Label musicLabel = new Label("Background Music:");
@@ -2042,6 +2071,7 @@ public class Main extends Application
         backgroundMusic.setScaleY(1.75);        
         backgroundMusic.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -2051,6 +2081,7 @@ public class Main extends Application
                         }
                     }
 
+                    //toggles the background music
                     try{
                         if(!backgroundMusicIsPlaying){
                             backgroundMusicIsPlaying = true;
@@ -2079,16 +2110,17 @@ public class Main extends Application
         musicVol.valueProperty().addListener(new InvalidationListener(){
                 @Override
                 public void invalidated(Observable observable){
+                    //sets the volume of the background music
                     audio.setMusicVol((int)Math.floor(musicVol.getValue()));
                 }
 
             });
-            
+
         VBox musicToggle = new VBox(musicLabel, backgroundMusic, musicVol);
         musicToggle.setSpacing(17);
         musicToggle.setTranslateX(80);
         musicToggle.setTranslateY(20);
-            
+
         Label effectsLabel = new Label("Sound Effects:");
         effectsLabel.setFont(new Font(16));
         effectsLabel.setTranslateX(-32);
@@ -2102,6 +2134,7 @@ public class Main extends Application
         soundEffects.setScaleY(1.75);        
         soundEffects.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
+                    //plays the appropriate sound effect
                     if(soundEffectsAllowed){
                         try{
                             audio.playEffect(buttonClick);
@@ -2111,6 +2144,7 @@ public class Main extends Application
                         }
                     }
 
+                    //toggles sound effects
                     try{
                         if(!soundEffectsAllowed){
                             soundEffectsAllowed = true;
@@ -2137,11 +2171,12 @@ public class Main extends Application
         fxVol.valueProperty().addListener(new InvalidationListener(){
                 @Override
                 public void invalidated(Observable observable){
+                    //sets the volume of the sound effects
                     audio.setFXVol((int)Math.floor(fxVol.getValue()));
                 }
 
             });
-            
+
         VBox effectsToggle = new VBox(effectsLabel, soundEffects, fxVol);
         effectsToggle.setSpacing(17);
         effectsToggle.setTranslateX(80);
@@ -2151,6 +2186,7 @@ public class Main extends Application
         Scene soundScene = new Scene(soundRoot, 200, 250);
         soundScene.setFill(Color.GREEN);
 
+        //creats and shows the sound controls window
         Stage soundStage = new Stage();
         soundStage.setTitle("Sound Settings");
         soundStage.setScene(soundScene);
@@ -2158,68 +2194,171 @@ public class Main extends Application
 
     }
 
-    public static void doAITurn(int personality){
-        switch(personality){
-            case 1:
-            aiProtocol1();
-            break;
-            case 2:
-            aiProtocol1();
-            //aiProtocol2();
-            break;
-            case 3:
-            aiProtocol1();
-            //aiProtocol3();
-            break;
-        }
-    }
+    //BELOW METHODS CONTROL THE BEHAVIOUR OF AI
 
-    public static void aiProtocol1(){
-        System.out.println("Doing behaviour set 1");
+    /**
+     * Procedure for an AI turn. The "AI" runs through the method and performs one of the
+     * available actions with a certain priority given to each action (dictated by its position
+     * in this method). Once the AI has performed an action, it will advance to the next player.
+     */
+    public static void doAITurn(){
         Player player = players[activePlayer];
 
-        if(!player.isHandFull()){
-            int level = random.nextInt(3) + 1;
-            int index = random.nextInt(5);
+        //in order to prevent every AI turn from being the same, the
+        //last tier (and most common) actions are determined through
+        //a random number generation.
+        int lastTierActions = random.nextInt(4) + 1;
 
-            switch(level){
-                case 1:
-                player.addCardToHand(level1Market[index]);
-                aiReserveCard(level1Deck, level1Available, index, level1Market);
-                break;
-                case 2:
-                player.addCardToHand(level2Market[index]);
-                aiReserveCard(level2Deck, level2Available, index, level2Market);
-                break;
-                case 3:
-                player.addCardToHand(level3Market[index]);
-                aiReserveCard(level3Deck, level3Available, index, level3Market);
-                break;
+        boolean completedTurn = false; //will become true once the turn is complete and skip 
+                                        //over any other possible actions for this turn
+
+        //in the case of purchasing a card or tile, the AI will run from left to right in
+        //the row, purchasing the first card or tile that it can
+        
+        if(!completedTurn){
+            //seeking patronage from a noble
+            for(int i = 0; i < noblesMarket.length; i++){
+                if(noblesMarket[i] != null){
+                    int success = aiPurchaseNoble(noblesMarket[i], i);
+                    if(success == 1){  
+                        completedTurn = true; 
+                        System.out.println("Got noble patronage");
+                        break;
+                    }
+                }
             }
         }
-        /*
-        if(player.getTotalGems() < 10){
-        int success = 0;
-        while(success != 2){
-        success = takeRandomGem();
-        System.out.println(success);
+
+        if(!completedTurn){
+            //buying a third level card
+            for(int i = 0; i < level3Market.length; i++){
+                if(level3Market[i] != null){
+                    int success = aiPurchaseCard(level3Market[i], level3Deck, level3Available, i, level3Market);
+                    if(success == 1){  
+                        completedTurn = true;  
+                        System.out.println("Bought level 3");
+                        break;
+                    }
+                }
+            }
         }
+
+        if(!completedTurn){
+            //buying a second level card
+            for(int i = 0; i < level2Market.length; i++){
+                if(level2Market[i] != null){
+                    int success = aiPurchaseCard(level2Market[i], level2Deck, level2Available, i, level2Market);
+                    if(success == 1){  
+                        completedTurn = true;  
+                        System.out.println("Bought level 2");
+                        break;
+                    }
+                }
+            }
         }
-         */
 
-        nextTurn();        
+        if(!completedTurn){
+            //buying a card in hand
+            Card[] hand = player.getHand();
+            for(int i = 0; i < hand.length; i++){
+                if(hand[i] != null){
+                    int success = aiPurchaseInHandCard(hand[i], i);
+                    if(success == 1){  
+                        completedTurn = true; 
+                        System.out.println("Bought from hand");
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(!completedTurn){
+            //buying a first level card
+            for(int i = 0; i < level1Market.length; i++){
+                if(level1Market[i] != null){
+                    int success = aiPurchaseCard(level1Market[i], level1Deck, level1Available, i, level1Market);
+                    if(success == 1){  
+                        completedTurn = true; 
+                        System.out.println("Bought level 1");
+                        break;
+                    }
+                }
+            }
+        }
+
+        //the AI will either take a random gem (which is done to create variety in AI turns) or reserve a random card
+        if(!completedTurn){
+            if(lastTierActions < 4){
+                //collecting gems
+                if(player.getTotalGems() < 10){
+                    int success = 0;
+                    player.addAllGemsForMarket();
+                    while(success != 2){
+                        success = takeRandomGem();
+                        System.out.println(success);
+                    }
+                }
+                else if(!player.isHandFull()){ //reserve a card
+                    int level = random.nextInt(3) + 1;
+                    int index = random.nextInt(5);
+
+                    switch(level){
+                        case 1:
+                        player.addCardToHand(level1Market[index]);
+                        aiReserveCard(level1Deck, level1Available, index, level1Market);
+                        break;
+                        case 2:
+                        player.addCardToHand(level2Market[index]);
+                        aiReserveCard(level2Deck, level2Available, index, level2Market);
+                        break;
+                        case 3:
+                        player.addCardToHand(level3Market[index]);
+                        aiReserveCard(level3Deck, level3Available, index, level3Market);
+                        break;
+                    }
+                }
+            }
+            else{
+                if(!player.isHandFull()){ //reserve a card
+                    int level = random.nextInt(3) + 1;
+                    int index = random.nextInt(5);
+
+                    switch(level){
+                        case 1:
+                        player.addCardToHand(level1Market[index]);
+                        aiReserveCard(level1Deck, level1Available, index, level1Market);
+                        break;
+                        case 2:
+                        player.addCardToHand(level2Market[index]);
+                        aiReserveCard(level2Deck, level2Available, index, level2Market);
+                        break;
+                        case 3:
+                        player.addCardToHand(level3Market[index]);
+                        aiReserveCard(level3Deck, level3Available, index, level3Market);
+                        break;
+                    }
+                }
+                else if(player.getTotalGems() < 10){ // collecting gems
+                    int success = 0;
+                    while(success != 2){
+                        success = takeRandomGem();
+                        System.out.println(success);
+                    }
+                }
+            }
+        }
+
+        nextTurn();       
     }
 
-    public static void aiProtocol2(){
-        System.out.println("Doing behaviour set 2");
-        nextTurn();  
-    }
-
-    public static void aiProtocol3(){
-        System.out.println("Doing behaviour set 3");
-        nextTurn();  
-    }
-
+    /**
+     * When called, the method will chose a random type of gem for the AI to take.
+     * This is done for 2 reasons:
+     * 1. Creates randomness and hence variety in AI turns
+     * 2. WAAAYYY too difficult and time intensive to program long-term strategy into this AI
+     * 
+     * @return 0 if a gem was not taken, 1 if a gem was taken but the turn does not end, and 2 if the gem is taken and ends the turn
+     */
     private static int takeRandomGem(){
         int gemToBeTaken = random.nextInt(5)+1;
         switch(gemToBeTaken){
@@ -2237,6 +2376,15 @@ public class Main extends Application
         return 0;
     }
 
+    /**
+     * Method called by the AI to reserve a card. A variation on the method used by a human player,
+     * however, this method cuts out the GUI elements and interfaces that a human would require.
+     * 
+     * @param deck - the deck of cards being drawn from
+     * @param marketDisplay - the display of cards available in the market for a given level
+     * @param index - the index of the card
+     * @param marketView - the Card[] of the appropriate market level
+     */
     private static void aiReserveCard(Stack<Card> deck, HBox marketDisplay, int index, Card[] marketView){
         if(!deck.isEmpty()) //if the deck is not empty
             marketDisplay.getChildren().remove(index); //remove the card
@@ -2257,8 +2405,10 @@ public class Main extends Application
         }
 
         //a new card is drawn to replace it
+        if(!deck.isEmpty()){
         Card newCard = deck.pop();
         Group newCardVisuals = newCard.getVisuals();
+    
 
         //***************
         //!!!RECURSION!!!
@@ -2267,6 +2417,105 @@ public class Main extends Application
         addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
         marketView[index] = newCard;
         marketDisplay.getChildren().add(index, newCardVisuals);
+    }
+
+    }
+
+    /**
+     * Method called by the AI to purchase a card. A variation on the method used by a human player,
+     * however, this method cuts out the GUI elements and interfaces that a human would require.
+     * 
+     * @param card - the card being purchased
+     * @param deck - the deck of cards being drawn from
+     * @param marketDisplay - the display of cards available in the market for a given level
+     * @param index - the index of the card
+     * @param marketView - the Card[] of the appropriate market level
+     */
+    private static int aiPurchaseCard(Card card, Stack<Card> deck, HBox marketDisplay, int index, Card[] marketView){
+        int success = purchaseCard(card);
+        if (success == 1){ // if the card can be purchased
+            if(!deck.isEmpty()){ //if the deck is not empty
+                marketDisplay.getChildren().remove(index); //remove the card
+            }
+            else{ // the deck is empty therefore make the deck back
+                // invisible to reflect an empty deck
+                if( deck == level1Deck){
+                    level1DeckBack.setVisible(false);
+                }
+                else if( deck == level2Deck){
+                    level2DeckBack.setVisible(false);
+                }
+                else{
+                    level3DeckBack.setVisible(false);
+                }
+                //set the card visuals to invisible as the card will not be replaced
+                marketDisplay.getChildren().get(index).setVisible(false);
+            }
+            players[activePlayer].addCard(card); // card is added to the player
+            players[activePlayer].spendGems(returnGems(card)); //gems are spent
+
+            //a new card is drawn to replace it
+            if(!deck.isEmpty()){            
+            Card newCard = deck.pop();
+            Group newCardVisuals = newCard.getVisuals();
+
+            //***************
+            //!!!RECURSION!!!
+            //***************
+            //Recursively adds functionality to the replacement card
+            addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+            marketView[index] = newCard;
+            marketDisplay.getChildren().add(index, newCardVisuals);
+        }
+
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    /**
+     * Method called by the AI to purchase a card from their hand.
+     * 
+     * @param card - the card being purchased
+     * @param index - the index of the card
+     * @return 1 if the card was successfully purchased, 0 if it was not
+     */
+    private static int aiPurchaseInHandCard(Card card, int index){
+        int success = purchaseCard(card);
+        if (success == 1){  //if the card can be purchased                       
+            players[activePlayer].getCardsInHand().getChildren().get(index).setVisible(false); //remove the card visuals from the hand
+            players[activePlayer].addCard(card); //applies the card to the player
+            players[activePlayer].spendGems(returnGems(card)); // spends gems
+            players[activePlayer].removeCardFromHand(index); // removes the cards from the hand
+
+            return 1;
+        }
+        else{
+            return 0;
+        }
+
+    }
+
+    /**
+     * Method called by the AI to purchase a noble from the market.
+     * 
+     * @param noble - the noble being purchased
+     * @param index - the index of the noble
+     * @return 1 if the noble was successfully purchased, 0 if it was not
+     */
+    private static int aiPurchaseNoble(Noble noble, int index){
+        int success = purchaseNoble(noble);
+        if (success == 1){//if the noble can be purchased
+            availableNobles.getChildren().get(index).setVisible(false); //set the noble to be invisible
+            players[activePlayer].addNoble(noble); //add the noble to the player
+
+            return 1;
+        }
+        else {
+            return 0;
+        }
 
     }
 }

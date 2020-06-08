@@ -12,8 +12,7 @@ import javafx.scene.input.MouseEvent;
 
 public class Card extends MarketObject
 {
-    GemType gemType;
-    
+    GemType gemType;    
 
     GemModels gemModels = new GemModels();
 

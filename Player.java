@@ -31,30 +31,31 @@ import java.util.Random;
 
 public class Player
 {
-    int id;
-    String name;
-    boolean isAI;
-    int aiProtocolID;
-    int victoryPoints = 0;
-    int diamond = 0;
-    int sapphire = 0;
-    int emerald = 0;
-    int ruby = 0;
-    int onyx = 0; 
-    int gold = 0;
-    int diamondCards = 0;
-    int sapphireCards = 0;
-    int emeraldCards = 0;
-    int rubyCards = 0;
-    int onyxCards = 0;
-    Card[] hand = new Card[3];
-    boolean hasNoble = false;
-
+    private int id;
+    private String name;
+    private boolean isAI;
+    private int victoryPoints = 0;
+    private int diamond = 0;
+    private int sapphire = 0;
+    private int emerald = 0;
+    private int ruby = 0;
+    private int onyx = 0; 
+    private int gold = 0;
+    private int diamondCards = 0;
+    private int sapphireCards = 0;
+    private int emeraldCards = 0;
+    private int rubyCards = 0;
+    private int onyxCards = 0;  
+    private Card[] hand = new Card[3];
+    private boolean hasNoble = false;
+    
     Group playerVisuals = new Group();
     GridPane inventory = new GridPane();
     ScrollPane gemPane;
     int inventoryCol = 0;
     int inventoryRow = 0;
+    
+    HBox cardsInHand;
 
     ArrayList<GemType> gemsForMarket = new ArrayList<GemType>();
 
@@ -74,9 +75,6 @@ public class Player
         this.id = id;
         this.name = name;
         this.isAI = isAI;
-
-        if(isAI) //assigns an AI player a "personality"
-            aiProtocolID = random.nextInt(3) + 1;
 
         /*
          * There are several if statements to see if id < 2.
@@ -214,6 +212,7 @@ public class Player
                 public void handle(MouseEvent event) {                     
 
                     if(Main.activePlayer == id){
+                        //plays appropriate sound effect
                         if(Main.soundEffectsAllowed){
                             try{
                                 Main.audio.playEffect(Main.buttonClick);
@@ -221,10 +220,9 @@ public class Player
                             catch(Exception e){
                                 e.printStackTrace();
                             }
-
                         }
 
-                        HBox cardsInHand = new HBox(); // display for reserved cards
+                        cardsInHand = new HBox(); // display for reserved cards
                         cardsInHand.setSpacing(4);
                         cardsInHand.setTranslateX(35);
                         cardsInHand.setTranslateY(70);
@@ -329,6 +327,7 @@ public class Player
         // being used for purchases, and it's effect is removed.
         gemModel.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){
+                    //plays appropriate sound effect
                     if(Main.soundEffectsAllowed){
                         try{
                             Main.audio.playEffect(Main.selectGem);
@@ -365,6 +364,9 @@ public class Player
      */
     public void addNoble(Noble noble){
         victoryPoints += noble.getVictoryPoints();
+        
+        //plays appropriate sound effect
+        if(!isAI){
         if(Main.soundEffectsAllowed){
             try{
                 Main.audio.playEffect(Main.scorePoint);
@@ -373,6 +375,8 @@ public class Player
                 e.printStackTrace();
             }                
         }
+    }
+        
         hasNoble = true;
         updateStatVisuals();
     }
@@ -384,6 +388,8 @@ public class Player
      */
     public void addCard(Card card){
         victoryPoints += card.getVictoryPoints();
+        
+        //plays appropriate sound effect
         if(card.getVictoryPoints() > 0){
          if(Main.soundEffectsAllowed){
             try{
@@ -420,7 +426,16 @@ public class Player
     public boolean getHasNoble(){
         return hasNoble;
     }
-
+    
+    /**
+     * Getter for the player's hand.
+     * 
+     * @return the players hand as a Card[]
+     */
+    public Card[] getHand(){
+     return hand;   
+    }
+    
     /**
      * Getter for the player's name;
      * 
@@ -503,6 +518,15 @@ public class Player
     }
 
     /**
+     * Getter for the player's isAI boolean
+     * 
+     * @return true if the player is AI
+     */
+    public boolean getIsAI(){
+    return isAI;    
+    }
+    
+    /**
      * Getter for the player's total development card, used for
      * breaking ties when determining a winner.
      * 
@@ -530,7 +554,7 @@ public class Player
     public void setActivePlayer(){
         border.setFill(Color.YELLOW);
         if(isAI)
-            Main.doAITurn(aiProtocolID);
+            Main.doAITurn();
     }
 
     /**
@@ -541,6 +565,15 @@ public class Player
         border.setFill(Color.GREY);
     }
 
+    /**
+     * Getter for the visual display of a players hand,
+     * 
+     * @return the player's hand HBox
+     */
+    public HBox getCardsInHand(){
+        return cardsInHand;
+    }
+    
     /**
      * Runs through the ArrayList of gems being used for purchases
      * and returns any unsused gems to the player's inventory.
@@ -608,6 +641,7 @@ public class Player
                 }
             }
         }
+ 
 
         //Returns the unused gems back into the player's inventory
         for (int i = 0; i < unusedGems.size(); i++){
@@ -662,6 +696,11 @@ public class Player
         hand[index] = null;           
     }
 
+    /**
+     * Determines if the player's hand is full
+     * 
+     * @return true if the player's hand is full
+     */
     public boolean isHandFull(){
         if(hand[0] == null || hand[1] == null || hand[2] == null)
             return false;
@@ -669,6 +708,35 @@ public class Player
             return true;
     }
 
+    /**
+     *  In the case of an AI, where the computer is not programmed to think strategically about what to buy,
+     *  the AI sends all of its gems to market, buys what it can, and is usually left with a lot of change.
+     */
+    public void addAllGemsForMarket(){
+        for(int i = 0; i < diamond; i++){
+            gemsForMarket.add(GemType.DIAMOND);
+        }
+        for(int i = 0; i < sapphire; i++){
+            gemsForMarket.add(GemType.SAPPHIRE);
+        }
+        for(int i = 0; i < emerald; i++){
+            gemsForMarket.add(GemType.EMERALD);
+        }
+        for(int i = 0; i < ruby; i++){
+            gemsForMarket.add(GemType.RUBY);
+        }
+        for(int i = 0; i < onyx; i++){
+            gemsForMarket.add(GemType.ONYX);
+        }
+        for(int i = 0; i < gold; i++){
+            gemsForMarket.add(GemType.GOLD);
+        }
+    }
+    
+    /**
+     * When a player enters their name as "Hodgson", the cheat is activiated giving them enough
+     * bonuses to buy any card for free.
+     */
     public void enableCheat(){
         diamondCards = 7;
         sapphireCards = 7;

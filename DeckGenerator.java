@@ -131,7 +131,7 @@ public class DeckGenerator
      * @param name - the name of the database less the ".txt" extension
      */
     private void printShuffledDeck(ArrayList<String> arrayList, String name) throws IOException{
-        PrintWriter out = new PrintWriter("./Resources/Card Databases/" + name + "_Shuffled.txt");
+        PrintWriter out = new PrintWriter("./Resources/Card Databases/" + name + "_Shuffled.txt"); //affixes "_Shuffled.txt" to the file
         for(int i = 0; i < arrayList.size(); i++){
            out.println(arrayList.get(i)); 
         }
