@@ -1136,6 +1136,7 @@ public class Main extends Application
                                 }
 
                                 //a new card is drawn to replace it
+                                if(!deck.isEmpty()){
                                 Card newCard = deck.pop();
                                 Group newCardVisuals = newCard.getVisuals();
 
@@ -1146,7 +1147,7 @@ public class Main extends Application
                                 addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
                                 marketView[index] = newCard;
                                 marketDisplay.getChildren().add(index, newCardVisuals);
-
+                            }
                                 nextTurn();
                             }
                             else {
@@ -1187,6 +1188,7 @@ public class Main extends Application
                                 }
 
                                 //a new card is drawn to replace it
+                                if(!deck.isEmpty()){
                                 Card newCard = deck.pop();
                                 Group newCardVisuals = newCard.getVisuals();
 
@@ -1197,7 +1199,8 @@ public class Main extends Application
                                 addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
                                 marketView[index] = newCard;
                                 marketDisplay.getChildren().add(index, newCardVisuals);
-
+                            }
+                            
                                 nextTurn();
                             }
                             else {
@@ -1275,6 +1278,58 @@ public class Main extends Application
         int leftoverOnyx = 0;
         int leftoverGold = 0;        
 
+        if(diamondCost - diamondForMarket > 0){
+            goldCost += diamondCost - diamondForMarket;
+            marketDiamond += diamondForMarket;
+        }
+        else if(diamondCost - diamondForMarket < 0){
+            leftoverDiamonds = diamondForMarket - diamondCost;
+            marketDiamond += diamondCost;
+        }
+        else
+            marketDiamond += diamondForMarket;   
+            if(sapphireCost - sapphireForMarket > 0){
+            goldCost += sapphireCost - sapphireForMarket;
+            marketSapphire += sapphireForMarket;
+        }
+        else if(sapphireCost - sapphireForMarket < 0){
+            leftoverSapphires = sapphireForMarket - sapphireCost;
+            marketSapphire += sapphireCost;
+        }
+        else
+            marketSapphire += sapphireForMarket;  
+             if(emeraldCost - emeraldForMarket > 0){
+            goldCost += emeraldCost - emeraldForMarket;
+            marketEmerald += emeraldForMarket;
+        }
+        else if(sapphireCost - sapphireForMarket < 0){
+            leftoverEmeralds = emeraldForMarket - emeraldCost;
+            marketEmerald += emeraldCost;
+        }
+        else
+            marketEmerald += emeraldForMarket;  
+                 if(rubyCost - rubyForMarket > 0){
+            goldCost += rubyCost - rubyForMarket;
+            marketRuby += rubyForMarket;
+        }
+        else if(sapphireCost - sapphireForMarket < 0){
+            leftoverRubies = rubyForMarket - rubyCost;
+            marketRuby += rubyCost;
+        }
+        else
+            marketRuby += rubyForMarket;  
+                     if(onyxCost - onyxForMarket > 0){
+            goldCost += onyxCost - onyxForMarket;
+            marketOnyx += onyxForMarket;
+        }
+        else if(sapphireCost - sapphireForMarket < 0){
+            leftoverOnyx = onyxForMarket - onyxCost;
+            marketOnyx += onyxCost;
+        }
+        else
+            marketOnyx += onyxForMarket;  
+            
+        /*
         //determines the number of excess gems
         if(diamondCost - diamondForMarket > 0){
             goldCost += diamondCost - diamondForMarket;
@@ -1332,7 +1387,8 @@ public class Main extends Application
         }
         else
             marketGold += goldForMarket;
-
+            */
+           
         //creates a list of the unused gems
         ArrayList<GemType> leftoverGems = new ArrayList<GemType>();
         if(leftoverDiamonds > 0){
@@ -1801,6 +1857,7 @@ public class Main extends Application
             level2Deck.clear();
         if(!level3Deck.isEmpty())
             level3Deck.clear();
+        System.gc();
 
         //regenerates the decks
         level1Deck = deckGenerator.generateLevel1Deck();
@@ -2222,7 +2279,6 @@ public class Main extends Application
                     int success = aiPurchaseNoble(noblesMarket[i], i);
                     if(success == 1){  
                         completedTurn = true; 
-                        System.out.println("Got noble patronage");
                         break;
                     }
                 }
@@ -2236,7 +2292,6 @@ public class Main extends Application
                     int success = aiPurchaseCard(level3Market[i], level3Deck, level3Available, i, level3Market);
                     if(success == 1){  
                         completedTurn = true;  
-                        System.out.println("Bought level 3");
                         break;
                     }
                 }
@@ -2250,7 +2305,6 @@ public class Main extends Application
                     int success = aiPurchaseCard(level2Market[i], level2Deck, level2Available, i, level2Market);
                     if(success == 1){  
                         completedTurn = true;  
-                        System.out.println("Bought level 2");
                         break;
                     }
                 }
@@ -2265,7 +2319,6 @@ public class Main extends Application
                     int success = aiPurchaseInHandCard(hand[i], i);
                     if(success == 1){  
                         completedTurn = true; 
-                        System.out.println("Bought from hand");
                         break;
                     }
                 }
@@ -2279,7 +2332,6 @@ public class Main extends Application
                     int success = aiPurchaseCard(level1Market[i], level1Deck, level1Available, i, level1Market);
                     if(success == 1){  
                         completedTurn = true; 
-                        System.out.println("Bought level 1");
                         break;
                     }
                 }
@@ -2295,7 +2347,6 @@ public class Main extends Application
                     player.addAllGemsForMarket();
                     while(success != 2){
                         success = takeRandomGem();
-                        System.out.println(success);
                     }
                 }
                 else if(!player.isHandFull()){ //reserve a card
@@ -2342,7 +2393,6 @@ public class Main extends Application
                     int success = 0;
                     while(success != 2){
                         success = takeRandomGem();
-                        System.out.println(success);
                     }
                 }
             }
@@ -2485,7 +2535,6 @@ public class Main extends Application
     private static int aiPurchaseInHandCard(Card card, int index){
         int success = purchaseCard(card);
         if (success == 1){  //if the card can be purchased                       
-            players[activePlayer].getCardsInHand().getChildren().get(index).setVisible(false); //remove the card visuals from the hand
             players[activePlayer].addCard(card); //applies the card to the player
             players[activePlayer].spendGems(returnGems(card)); // spends gems
             players[activePlayer].removeCardFromHand(index); // removes the cards from the hand

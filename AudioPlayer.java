@@ -9,7 +9,7 @@ public class AudioPlayer
     
     //gain levels for the audio
     private int musicGain = -10;
-    private int fxGain = -6;
+    private int fxGain = -8;
     
     /**
      *  Continuously plays the background music when called.
@@ -67,7 +67,7 @@ public class AudioPlayer
         Clip victoryClip;
         
         AudioInputStream ais;      
-        ais = AudioSystem.getAudioInputStream(new File("./Resources/Sounds/victory.wav")); 
+        ais = AudioSystem.getAudioInputStream(new File("./Resources/Sounds/victoryFanfare.wav")); 
         
         victoryClip = AudioSystem.getClip();
         

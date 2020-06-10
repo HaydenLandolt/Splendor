@@ -55,6 +55,7 @@ public class GemModels
         
         //imports the resource file
         try {            
+            objImporter.clear();
             objImporter.read(gemFile);        
         }
         catch (ImportException e) {

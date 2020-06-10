@@ -5,13 +5,12 @@ import javafx.scene.Scene;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 
 import javafx.scene.effect.Glow;
 
 import javafx.scene.input.MouseEvent;
 
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -50,10 +49,8 @@ public class Player
     private boolean hasNoble = false;
     
     Group playerVisuals = new Group();
-    GridPane inventory = new GridPane();
-    ScrollPane gemPane;
-    int inventoryCol = 0;
-    int inventoryRow = 0;
+    Pane firstInventory;
+    Pane secondInventory;
     
     HBox cardsInHand;
 
@@ -83,10 +80,14 @@ public class Player
          * in a vertical fashion, as opposed to the horizontal fashion
          * of players 1 and 2.
          */
-        if (id < 2)
-            inventory.setHgap(4);
-        else
-            inventory.setVgap(4);
+        if (id < 2){
+            firstInventory = new HBox(14);
+            secondInventory = new HBox(14);
+        }
+        else{
+            firstInventory = new VBox(14);
+            secondInventory = new VBox(14);
+        }
 
         //creates the border
         if(id < 2)
@@ -118,16 +119,26 @@ public class Player
         }
 
         //creats the player's inventory of gems
-        gemPane = new ScrollPane(inventory);
+        Rectangle gemPane;        
         if(id < 2){
+            gemPane = new Rectangle(315, 90);
+            gemPane.setFill(Color.WHITE);
             gemPane.setTranslateX(370);
             gemPane.setTranslateY(5);
-            gemPane.setPrefSize(315, 90);
+            firstInventory.setTranslateX(370);
+            firstInventory.setTranslateY(5);
+            secondInventory.setTranslateX(370);
+            secondInventory.setTranslateY(50);
         }
-        else{
+        else{            
+            gemPane = new Rectangle(90,250);
+            gemPane.setFill(Color.WHITE);
             gemPane.setTranslateX(10);
             gemPane.setTranslateY(135);
-            gemPane.setPrefSize(90, 250);
+            firstInventory.setTranslateX(10);
+            firstInventory.setTranslateY(135);
+            secondInventory.setTranslateX(55);
+            secondInventory.setTranslateY(135);
         }
 
         //sets up the display of player bonuses
@@ -265,7 +276,7 @@ public class Player
 
         //add the elements to the player's visuals
         playerVisuals.getChildren().addAll(border, vpLayout, gemPane, cardDisplay,
-            sideCardDisplay);
+            sideCardDisplay, firstInventory, secondInventory);
     }
 
     /**
@@ -312,13 +323,6 @@ public class Player
         else 
             gold++;
 
-        //sets the row and column
-        inventoryRow++;
-        if(inventoryRow == 6){
-            inventoryRow = 0;
-            inventoryCol++;
-        }
-
         //allows the gem to be clicked on and to be used for purchases
         //when the gem is to be used for purchases, the gem is clicked making
         // it "glow", therefore, when a player clicks a non-glowing gem, it
@@ -335,8 +339,9 @@ public class Player
                         catch(Exception e){
                             e.printStackTrace();
                         }                
-                    }
-
+                    }                    
+                    
+                    if(Main.activePlayer == id){
                     if (gemModel.getEffect() == null){
                         Glow glow = new Glow();
                         glow.setLevel(3);
@@ -348,13 +353,20 @@ public class Player
                         gemsForMarket.remove(gem);
                     }
                 }
+                }
             });
 
         //adds the gem to the inventory
+        if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        /*
         if(id < 2)
             inventory.add(gemModel, inventoryRow, inventoryCol);
         else
             inventory.add(gemModel, inventoryCol, inventoryRow);
+            */
     }
 
     /**
@@ -630,33 +642,41 @@ public class Player
         //updates the player's bonuses and victory points
         updateStatVisuals();
 
+        if(isAI){
+         firstInventory.getChildren().clear(); 
+         secondInventory.getChildren().clear(); 
+        }
+        else{
         //Removes any Gems with the glow effect applied to it
         //(any gems being sent to market).
         ArrayList<Integer> indexesToBeRemoved = new ArrayList<Integer>();
-        for(int i = 0; i < inventory.getChildren().size(); i++){
-            if(inventory.getChildren().get(i) instanceof Group){
-                if (inventory.getChildren().get(i).getEffect() instanceof Glow){
-                    inventory.getChildren().remove(i);
+        for(int i = 0; i < firstInventory.getChildren().size(); i++){
+            if(firstInventory.getChildren().get(i) instanceof Group){
+                if (firstInventory.getChildren().get(i).getEffect() instanceof Glow){
+                    firstInventory.getChildren().remove(i);
                     i--;
                 }
             }
         }
+        for(int i = 0; i < secondInventory.getChildren().size(); i++){
+            if(secondInventory.getChildren().get(i) instanceof Group){
+                if (secondInventory.getChildren().get(i).getEffect() instanceof Glow){
+                    secondInventory.getChildren().remove(i);
+                    i--;
+                }
+            }
+        }
+    }
  
 
         //Returns the unused gems back into the player's inventory
         for (int i = 0; i < unusedGems.size(); i++){
             Group gemModel = gemModels.getGem(unusedGems.get(i));
 
-            inventoryRow++;
-            if(inventoryRow == 6){
-                inventoryRow = 0;
-                inventoryCol++;
-            }
-
-            if(id < 2)
-                inventory.add(gemModel, inventoryRow, inventoryCol);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
             else
-                inventory.add(gemModel, inventoryCol, inventoryRow);
+            secondInventory.getChildren().add(gemModel);
         }
 
     }
