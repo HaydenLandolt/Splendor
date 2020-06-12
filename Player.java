@@ -330,8 +330,12 @@ public class Player
         // a glowing gem is clicked, it is removed from the list of gems
         // being used for purchases, and it's effect is removed.
         gemModel.setOnMousePressed( new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent event){
-                    //plays appropriate sound effect
+                public void handle(MouseEvent event){                                     
+                    
+                    System.out.println("Gem Clicked " + gemModel);
+                    
+                    if(Main.activePlayer == id){
+                        //plays appropriate sound effect
                     if(Main.soundEffectsAllowed){
                         try{
                             Main.audio.playEffect(Main.selectGem);
@@ -339,10 +343,9 @@ public class Player
                         catch(Exception e){
                             e.printStackTrace();
                         }                
-                    }                    
+                    }   
                     
-                    if(Main.activePlayer == id){
-                    if (gemModel.getEffect() == null){
+                        if (gemModel.getEffect() == null){
                         Glow glow = new Glow();
                         glow.setLevel(3);
                         gemModel.setEffect(glow);
@@ -642,43 +645,52 @@ public class Player
         //updates the player's bonuses and victory points
         updateStatVisuals();
 
-        if(isAI){
-         firstInventory.getChildren().clear(); 
-         secondInventory.getChildren().clear(); 
-        }
-        else{
-        //Removes any Gems with the glow effect applied to it
-        //(any gems being sent to market).
-        ArrayList<Integer> indexesToBeRemoved = new ArrayList<Integer>();
-        for(int i = 0; i < firstInventory.getChildren().size(); i++){
-            if(firstInventory.getChildren().get(i) instanceof Group){
-                if (firstInventory.getChildren().get(i).getEffect() instanceof Glow){
-                    firstInventory.getChildren().remove(i);
-                    i--;
-                }
-            }
-        }
-        for(int i = 0; i < secondInventory.getChildren().size(); i++){
-            if(secondInventory.getChildren().get(i) instanceof Group){
-                if (secondInventory.getChildren().get(i).getEffect() instanceof Glow){
-                    secondInventory.getChildren().remove(i);
-                    i--;
-                }
-            }
-        }
-    }
- 
-
-        //Returns the unused gems back into the player's inventory
-        for (int i = 0; i < unusedGems.size(); i++){
-            Group gemModel = gemModels.getGem(unusedGems.get(i));
-
+        firstInventory.getChildren().clear(); 
+        secondInventory.getChildren().clear();
+        for(int i = 0; i < diamond; i++){
+             Group gemModel = gemModels.getGem(GemType.DIAMOND);
             if(firstInventory.getChildren().size() < 5)
             firstInventory.getChildren().add(gemModel);
             else
             secondInventory.getChildren().add(gemModel);
         }
-
+        for(int i = 0; i < sapphire; i++){
+             Group gemModel = gemModels.getGem(GemType.SAPPHIRE);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        }
+        for(int i = 0; i < emerald; i++){
+             Group gemModel = gemModels.getGem(GemType.EMERALD);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        }
+        for(int i = 0; i < ruby; i++){
+             Group gemModel = gemModels.getGem(GemType.RUBY);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        }
+        for(int i = 0; i < onyx; i++){
+             Group gemModel = gemModels.getGem(GemType.ONYX);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        }
+        for(int i = 0; i < gold; i++){
+             Group gemModel = gemModels.getGem(GemType.GOLD);
+            if(firstInventory.getChildren().size() < 5)
+            firstInventory.getChildren().add(gemModel);
+            else
+            secondInventory.getChildren().add(gemModel);
+        }         
+        
+        gemsForMarket.clear();
     }
 
     /**

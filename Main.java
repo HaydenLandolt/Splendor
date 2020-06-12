@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
-import java.util.concurrent.TimeUnit;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
@@ -683,7 +681,7 @@ public class Main extends Application
         winnerScreenLogo.setTranslateX(-550);
         winnerScreenLogo.setTranslateY(-250);
 
-        mainMenuButton = new Button("Main Menu");
+        mainMenuButton = new Button("EXIT");
         mainMenuButton.setTextAlignment(TextAlignment.CENTER);
         mainMenuButton.setScaleX(2);
         mainMenuButton.setScaleY(2);
@@ -701,8 +699,7 @@ public class Main extends Application
                         }
                     }
 
-                    isSinglePlayer = false;
-                    stage.setScene(mainMenu);
+                    System.exit(0);//quits the game
                 }
             }); 
 
@@ -1278,6 +1275,7 @@ public class Main extends Application
         int leftoverOnyx = 0;
         int leftoverGold = 0;        
 
+        //determines the number of excess gems
         if(diamondCost - diamondForMarket > 0){
             goldCost += diamondCost - diamondForMarket;
             marketDiamond += diamondForMarket;
@@ -1329,66 +1327,7 @@ public class Main extends Application
         else
             marketOnyx += onyxForMarket;  
             
-        /*
-        //determines the number of excess gems
-        if(diamondCost - diamondForMarket > 0){
-            goldCost += diamondCost - diamondForMarket;
-            marketDiamond += diamondForMarket;
-        }
-        else if(diamondCost - diamondForMarket < 0){
-            leftoverDiamonds += diamondForMarket - diamondCost;
-            marketDiamond += diamondForMarket - leftoverDiamonds;
-        }
-        else
-            marketDiamond += diamondForMarket;        
-        if(sapphireCost - sapphireForMarket > 0){
-            goldCost += sapphireCost - sapphireForMarket;
-            marketSapphire += sapphireForMarket;
-        }
-        else if(sapphireCost - sapphireForMarket < 0){
-            leftoverSapphires += sapphireForMarket - sapphireCost;
-            marketSapphire += sapphireForMarket - leftoverSapphires;
-        }
-        else
-            marketSapphire += sapphireForMarket;
-        if(emeraldCost - emeraldForMarket > 0){
-            goldCost += emeraldCost - emeraldForMarket;
-            marketEmerald += emeraldForMarket;
-        }
-        else if(emeraldCost - emeraldForMarket < 0){
-            leftoverEmeralds += emeraldForMarket - emeraldCost;
-            marketEmerald += emeraldForMarket - leftoverEmeralds;
-        }
-        else
-            marketEmerald += emeraldForMarket;
-        if(rubyCost - rubyForMarket > 0){
-            goldCost += rubyCost - rubyForMarket;
-            marketRuby += rubyForMarket;
-        }
-        else if(rubyCost - rubyForMarket < 0){
-            leftoverRubies += rubyForMarket - rubyCost;
-            marketRuby += rubyForMarket - leftoverRubies;
-        }
-        else
-            marketRuby += rubyForMarket;
-        if(onyxCost - onyxForMarket > 0){
-            onyxCost += onyxCost - onyxForMarket;
-            marketOnyx += onyxForMarket;
-        }
-        else if(onyxCost - onyxForMarket < 0){
-            leftoverOnyx += onyxForMarket - onyxCost;
-            marketOnyx += onyxForMarket - leftoverOnyx;
-        }
-        else
-            marketOnyx += onyxForMarket;
-        if(goldCost - goldForMarket < 0){
-            leftoverGold += goldForMarket - goldCost;
-            marketGold += goldForMarket - leftoverGold;
-        }
-        else
-            marketGold += goldForMarket;
-            */
-           
+      
         //creates a list of the unused gems
         ArrayList<GemType> leftoverGems = new ArrayList<GemType>();
         if(leftoverDiamonds > 0){
@@ -2413,16 +2352,32 @@ public class Main extends Application
         int gemToBeTaken = random.nextInt(5)+1;
         switch(gemToBeTaken){
             case 1:
+            if(marketDiamond > 0)
             return takeGem(GemType.DIAMOND);
+            else
+            return 0;
             case 2:
+            if(marketSapphire > 0)
             return takeGem(GemType.SAPPHIRE);
+            else
+            return 0;
             case 3:
+            if(marketEmerald > 0)
             return takeGem(GemType.EMERALD);
+            else
+            return 0;
             case 4:
+            if(marketRuby > 0)
             return takeGem(GemType.RUBY);
+            else
+            return 0;
             case 5:
+            if(marketOnyx > 0)
             return takeGem(GemType.ONYX);
+            else
+            return 0;
         }
+        updateGemVisuals();
         return 0;
     }
 

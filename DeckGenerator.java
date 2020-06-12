@@ -71,7 +71,6 @@ public class DeckGenerator
        //adds the shuffled cards to the deck
         while(input.hasNext()){
             Card card = new Card(input.nextInt(), GemType.valueOf(input.next()), input.nextInt(), input.nextInt(), input.nextInt(), input.nextInt(), input.nextInt());
-            System.out.println(card); // HEAP SPACE OCCURS AFTER THE 12th CARD IS GENERATED
             deck.push(card);
         }
         
