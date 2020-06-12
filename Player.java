@@ -47,11 +47,11 @@ public class Player
     private int onyxCards = 0;  
     private Card[] hand = new Card[3];
     private boolean hasNoble = false;
-    
+
     Group playerVisuals = new Group();
     Pane firstInventory;
     Pane secondInventory;
-    
+
     HBox cardsInHand;
 
     ArrayList<GemType> gemsForMarket = new ArrayList<GemType>();
@@ -331,45 +331,45 @@ public class Player
         // being used for purchases, and it's effect is removed.
         gemModel.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event){                                     
-                    
+
                     System.out.println("Gem Clicked " + gemModel);
-                    
+
                     if(Main.activePlayer == id){
                         //plays appropriate sound effect
-                    if(Main.soundEffectsAllowed){
-                        try{
-                            Main.audio.playEffect(Main.selectGem);
-                        }
-                        catch(Exception e){
-                            e.printStackTrace();
-                        }                
-                    }   
-                    
+                        if(Main.soundEffectsAllowed){
+                            try{
+                                Main.audio.playEffect(Main.selectGem);
+                            }
+                            catch(Exception e){
+                                e.printStackTrace();
+                            }                
+                        }   
+
                         if (gemModel.getEffect() == null){
-                        Glow glow = new Glow();
-                        glow.setLevel(3);
-                        gemModel.setEffect(glow);
-                        gemsForMarket.add(gem);
+                            Glow glow = new Glow();
+                            glow.setLevel(3);
+                            gemModel.setEffect(glow);
+                            gemsForMarket.add(gem);
+                        }
+                        else{
+                            gemModel.setEffect(null);
+                            gemsForMarket.remove(gem);
+                        }
                     }
-                    else{
-                        gemModel.setEffect(null);
-                        gemsForMarket.remove(gem);
-                    }
-                }
                 }
             });
 
         //adds the gem to the inventory
         if(firstInventory.getChildren().size() < 5)
             firstInventory.getChildren().add(gemModel);
-            else
+        else
             secondInventory.getChildren().add(gemModel);
         /*
         if(id < 2)
-            inventory.add(gemModel, inventoryRow, inventoryCol);
+        inventory.add(gemModel, inventoryRow, inventoryCol);
         else
-            inventory.add(gemModel, inventoryCol, inventoryRow);
-            */
+        inventory.add(gemModel, inventoryCol, inventoryRow);
+         */
     }
 
     /**
@@ -379,19 +379,19 @@ public class Player
      */
     public void addNoble(Noble noble){
         victoryPoints += noble.getVictoryPoints();
-        
+
         //plays appropriate sound effect
         if(!isAI){
-        if(Main.soundEffectsAllowed){
-            try{
-                Main.audio.playEffect(Main.scorePoint);
+            if(Main.soundEffectsAllowed){
+                try{
+                    Main.audio.playEffect(Main.scorePoint);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }                
             }
-            catch(Exception e){
-                e.printStackTrace();
-            }                
         }
-    }
-        
+
         hasNoble = true;
         updateStatVisuals();
     }
@@ -403,19 +403,19 @@ public class Player
      */
     public void addCard(Card card){
         victoryPoints += card.getVictoryPoints();
-        
+
         //plays appropriate sound effect
         if(card.getVictoryPoints() > 0){
-         if(Main.soundEffectsAllowed){
-            try{
-                Main.audio.playEffect(Main.scorePoint);
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }                
-        }   
+            if(Main.soundEffectsAllowed){
+                try{
+                    Main.audio.playEffect(Main.scorePoint);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }                
+            }   
         }
-        
+
         if (card.getGemType() == GemType.DIAMOND){
             diamondCards++;
         }
@@ -441,16 +441,16 @@ public class Player
     public boolean getHasNoble(){
         return hasNoble;
     }
-    
+
     /**
      * Getter for the player's hand.
      * 
      * @return the players hand as a Card[]
      */
     public Card[] getHand(){
-     return hand;   
+        return hand;   
     }
-    
+
     /**
      * Getter for the player's name;
      * 
@@ -538,9 +538,9 @@ public class Player
      * @return true if the player is AI
      */
     public boolean getIsAI(){
-    return isAI;    
+        return isAI;    
     }
-    
+
     /**
      * Getter for the player's total development card, used for
      * breaking ties when determining a winner.
@@ -588,7 +588,7 @@ public class Player
     public HBox getCardsInHand(){
         return cardsInHand;
     }
-    
+
     /**
      * Runs through the ArrayList of gems being used for purchases
      * and returns any unsused gems to the player's inventory.
@@ -648,48 +648,48 @@ public class Player
         firstInventory.getChildren().clear(); 
         secondInventory.getChildren().clear();
         for(int i = 0; i < diamond; i++){
-             Group gemModel = gemModels.getGem(GemType.DIAMOND);
+            Group gemModel = gemModels.getGem(GemType.DIAMOND);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }
         for(int i = 0; i < sapphire; i++){
-             Group gemModel = gemModels.getGem(GemType.SAPPHIRE);
+            Group gemModel = gemModels.getGem(GemType.SAPPHIRE);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }
         for(int i = 0; i < emerald; i++){
-             Group gemModel = gemModels.getGem(GemType.EMERALD);
+            Group gemModel = gemModels.getGem(GemType.EMERALD);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }
         for(int i = 0; i < ruby; i++){
-             Group gemModel = gemModels.getGem(GemType.RUBY);
+            Group gemModel = gemModels.getGem(GemType.RUBY);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }
         for(int i = 0; i < onyx; i++){
-             Group gemModel = gemModels.getGem(GemType.ONYX);
+            Group gemModel = gemModels.getGem(GemType.ONYX);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }
         for(int i = 0; i < gold; i++){
-             Group gemModel = gemModels.getGem(GemType.GOLD);
+            Group gemModel = gemModels.getGem(GemType.GOLD);
             if(firstInventory.getChildren().size() < 5)
-            firstInventory.getChildren().add(gemModel);
+                firstInventory.getChildren().add(gemModel);
             else
-            secondInventory.getChildren().add(gemModel);
+                secondInventory.getChildren().add(gemModel);
         }         
-        
+
         gemsForMarket.clear();
     }
 
@@ -764,7 +764,7 @@ public class Player
             gemsForMarket.add(GemType.GOLD);
         }
     }
-    
+
     /**
      * When a player enters their name as "Hodgson", the cheat is activiated giving them enough
      * bonuses to buy any card for free.

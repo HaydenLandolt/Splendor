@@ -1,5 +1,7 @@
-import javafx.scene.image.ImageView;
 import javafx.scene.Group;
+
+import javafx.scene.image.ImageView;
+
 public class Noble extends MarketObject
 {
     /**

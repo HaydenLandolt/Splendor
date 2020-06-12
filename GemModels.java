@@ -1,14 +1,18 @@
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import com.interactivemesh.jfx.importer.ImportException;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.MeshView;
-import javafx.scene.Group;
+
 import java.io.File;
+
+import javafx.scene.Group;
+
 import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+
+import javafx.scene.shape.MeshView;
 
 public class GemModels
 {
-     ObjModelImporter objImporter = new ObjModelImporter();
+     ObjModelImporter objImporter = new ObjModelImporter(); //initializes the model importer
      
     /**
      *  Returns the model for a gem.

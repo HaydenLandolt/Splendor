@@ -1,6 +1,12 @@
-import javax.sound.sampled.*;
-import javax.sound.sampled.Control;
 import java.io.File;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.Control;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
+
 public class AudioPlayer
 {
     Clip clip;

@@ -1,4 +1,5 @@
 import javafx.scene.Group;
+
 public class MarketObject
 {
     Group visuals;    

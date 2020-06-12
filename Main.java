@@ -1,4 +1,3 @@
-
 import com.interactivemesh.jfx.importer.ImportException;
 
 import java.awt.Desktop;
@@ -55,7 +54,7 @@ public class Main extends Application
     static AudioPlayer audio = new AudioPlayer();
     static Player[] players; 
     static Random random = new Random();
-    
+
     //Sound files
     static File berwickCourt = new File("./Resources/Sounds/BerwickCourt.wav");
     static File buttonClick = new File("./Resources/Sounds/buttonClick.wav");
@@ -91,7 +90,7 @@ public class Main extends Application
     TextField player2NameField = new TextField();
     TextField player3NameField = new TextField();
     TextField player4NameField = new TextField();
-    
+
     //Other name screen elements
     Button namesDone;
     Text loadingWarning = new Text();
@@ -116,7 +115,7 @@ public class Main extends Application
     //Gem market area
     GemModels gemModels = new GemModels();
     static GridPane marketGemDisplay;
-    
+
     //Market object decks
     static Stack<Noble> nobleDeck;
     static Stack<Card> level1Deck = new Stack<Card>();
@@ -392,7 +391,7 @@ public class Main extends Application
                         int success = players[activePlayer].addCardToHand(level1Deck.peek());
                         if (success == 1){
                             level1Deck.pop();
-                            
+
                             //plays the appropriate sound effect
                             if(soundEffectsAllowed){
                                 try{
@@ -402,7 +401,7 @@ public class Main extends Application
                                     e.printStackTrace();
                                 }
                             }
-                            
+
                             //takes a gold if possible
                             if (marketGold == 1 && players[activePlayer].getTotalGems() < 10){                        
                                 marketGold--;
@@ -413,7 +412,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            
+
                             //advance to next player
                             nextTurn();
                         }
@@ -452,7 +451,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            
+
                             //advance to next player
                             nextTurn();
                         }
@@ -491,7 +490,7 @@ public class Main extends Application
                                 marketGold--;
                                 players[activePlayer].addGem(GemType.GOLD);
                             }
-                            
+
                             //advance to next player
                             nextTurn();
                         }
@@ -902,7 +901,7 @@ public class Main extends Application
         namesDone.setScaleY(1.75);
         namesDone.setTranslateX(590);
         namesDone.setTranslateY(600);
-        
+
         //creates the loading warning
         namesDone.setOnMousePressed( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
@@ -923,7 +922,7 @@ public class Main extends Application
                     loadingWarning.setTranslateY(578);
                 }
             }); 
-            
+
         // takes the names and starts a new game
         namesDone.setOnMouseClicked( new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent event) {
@@ -1134,17 +1133,17 @@ public class Main extends Application
 
                                 //a new card is drawn to replace it
                                 if(!deck.isEmpty()){
-                                Card newCard = deck.pop();
-                                Group newCardVisuals = newCard.getVisuals();
+                                    Card newCard = deck.pop();
+                                    Group newCardVisuals = newCard.getVisuals();
 
-                                //***************
-                                //!!!RECURSION!!!
-                                //***************
-                                //Recursively adds functionality to the replacement card
-                                addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
-                                marketView[index] = newCard;
-                                marketDisplay.getChildren().add(index, newCardVisuals);
-                            }
+                                    //***************
+                                    //!!!RECURSION!!!
+                                    //***************
+                                    //Recursively adds functionality to the replacement card
+                                    addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+                                    marketView[index] = newCard;
+                                    marketDisplay.getChildren().add(index, newCardVisuals);
+                                }
                                 nextTurn();
                             }
                             else {
@@ -1186,18 +1185,18 @@ public class Main extends Application
 
                                 //a new card is drawn to replace it
                                 if(!deck.isEmpty()){
-                                Card newCard = deck.pop();
-                                Group newCardVisuals = newCard.getVisuals();
+                                    Card newCard = deck.pop();
+                                    Group newCardVisuals = newCard.getVisuals();
 
-                                //***************
-                                //!!!RECURSION!!!
-                                //***************
-                                //Recursively adds functionality to the replacement card
-                                addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
-                                marketView[index] = newCard;
-                                marketDisplay.getChildren().add(index, newCardVisuals);
-                            }
-                            
+                                    //***************
+                                    //!!!RECURSION!!!
+                                    //***************
+                                    //Recursively adds functionality to the replacement card
+                                    addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+                                    marketView[index] = newCard;
+                                    marketDisplay.getChildren().add(index, newCardVisuals);
+                                }
+
                                 nextTurn();
                             }
                             else {
@@ -1286,7 +1285,7 @@ public class Main extends Application
         }
         else
             marketDiamond += diamondForMarket;   
-            if(sapphireCost - sapphireForMarket > 0){
+        if(sapphireCost - sapphireForMarket > 0){
             goldCost += sapphireCost - sapphireForMarket;
             marketSapphire += sapphireForMarket;
         }
@@ -1296,7 +1295,7 @@ public class Main extends Application
         }
         else
             marketSapphire += sapphireForMarket;  
-             if(emeraldCost - emeraldForMarket > 0){
+        if(emeraldCost - emeraldForMarket > 0){
             goldCost += emeraldCost - emeraldForMarket;
             marketEmerald += emeraldForMarket;
         }
@@ -1306,7 +1305,7 @@ public class Main extends Application
         }
         else
             marketEmerald += emeraldForMarket;  
-                 if(rubyCost - rubyForMarket > 0){
+        if(rubyCost - rubyForMarket > 0){
             goldCost += rubyCost - rubyForMarket;
             marketRuby += rubyForMarket;
         }
@@ -1316,7 +1315,7 @@ public class Main extends Application
         }
         else
             marketRuby += rubyForMarket;  
-                     if(onyxCost - onyxForMarket > 0){
+        if(onyxCost - onyxForMarket > 0){
             goldCost += onyxCost - onyxForMarket;
             marketOnyx += onyxForMarket;
         }
@@ -1326,8 +1325,7 @@ public class Main extends Application
         }
         else
             marketOnyx += onyxForMarket;  
-            
-      
+
         //creates a list of the unused gems
         ArrayList<GemType> leftoverGems = new ArrayList<GemType>();
         if(leftoverDiamonds > 0){
@@ -1411,7 +1409,7 @@ public class Main extends Application
 
         //Updates the active player
         activePlayer++;
-        
+
         //Checks if there is a winner
         String winnerName = null;
         if(activePlayer == numberOfPlayers){
@@ -1669,7 +1667,7 @@ public class Main extends Application
         catch(Exception e){
             e.printStackTrace();   
         }
-        
+
         Glow glow = new Glow();
         glow.setLevel(5);
 
@@ -2178,6 +2176,7 @@ public class Main extends Application
         effectsToggle.setTranslateX(80);
         effectsToggle.setTranslateY(130);
 
+        //Creates the root and scene for the sound controls
         Group soundRoot = new Group(musicToggle, effectsToggle);
         Scene soundScene = new Scene(soundRoot, 200, 250);
         soundScene.setFill(Color.GREEN);
@@ -2206,11 +2205,11 @@ public class Main extends Application
         int lastTierActions = random.nextInt(4) + 1;
 
         boolean completedTurn = false; //will become true once the turn is complete and skip 
-                                        //over any other possible actions for this turn
+        //over any other possible actions for this turn
 
         //in the case of purchasing a card or tile, the AI will run from left to right in
         //the row, purchasing the first card or tile that it can
-        
+
         if(!completedTurn){
             //seeking patronage from a noble
             for(int i = 0; i < noblesMarket.length; i++){
@@ -2353,29 +2352,29 @@ public class Main extends Application
         switch(gemToBeTaken){
             case 1:
             if(marketDiamond > 0)
-            return takeGem(GemType.DIAMOND);
+                return takeGem(GemType.DIAMOND);
             else
-            return 0;
+                return 0;
             case 2:
             if(marketSapphire > 0)
-            return takeGem(GemType.SAPPHIRE);
+                return takeGem(GemType.SAPPHIRE);
             else
-            return 0;
+                return 0;
             case 3:
             if(marketEmerald > 0)
-            return takeGem(GemType.EMERALD);
+                return takeGem(GemType.EMERALD);
             else
-            return 0;
+                return 0;
             case 4:
             if(marketRuby > 0)
-            return takeGem(GemType.RUBY);
+                return takeGem(GemType.RUBY);
             else
-            return 0;
+                return 0;
             case 5:
             if(marketOnyx > 0)
-            return takeGem(GemType.ONYX);
+                return takeGem(GemType.ONYX);
             else
-            return 0;
+                return 0;
         }
         updateGemVisuals();
         return 0;
@@ -2411,18 +2410,17 @@ public class Main extends Application
 
         //a new card is drawn to replace it
         if(!deck.isEmpty()){
-        Card newCard = deck.pop();
-        Group newCardVisuals = newCard.getVisuals();
-    
+            Card newCard = deck.pop();
+            Group newCardVisuals = newCard.getVisuals();
 
-        //***************
-        //!!!RECURSION!!!
-        //***************
-        //Recursively adds functionality to the replacement card
-        addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
-        marketView[index] = newCard;
-        marketDisplay.getChildren().add(index, newCardVisuals);
-    }
+            //***************
+            //!!!RECURSION!!!
+            //***************
+            //Recursively adds functionality to the replacement card
+            addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+            marketView[index] = newCard;
+            marketDisplay.getChildren().add(index, newCardVisuals);
+        }
 
     }
 
@@ -2461,17 +2459,17 @@ public class Main extends Application
 
             //a new card is drawn to replace it
             if(!deck.isEmpty()){            
-            Card newCard = deck.pop();
-            Group newCardVisuals = newCard.getVisuals();
+                Card newCard = deck.pop();
+                Group newCardVisuals = newCard.getVisuals();
 
-            //***************
-            //!!!RECURSION!!!
-            //***************
-            //Recursively adds functionality to the replacement card
-            addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
-            marketView[index] = newCard;
-            marketDisplay.getChildren().add(index, newCardVisuals);
-        }
+                //***************
+                //!!!RECURSION!!!
+                //***************
+                //Recursively adds functionality to the replacement card
+                addMarketCardFunction(marketDisplay, index, newCard, newCardVisuals, deck, marketView);
+                marketView[index] = newCard;
+                marketDisplay.getChildren().add(index, newCardVisuals);
+            }
 
             return 1;
         }
